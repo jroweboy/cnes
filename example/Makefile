@@ -77,6 +77,9 @@ $(OBJ_DIR)/%.nes.s: $(SRC_DIR)/%.c
 
 -include $(OBJS:%.nes.o=%.nes.d)
 
+$(LIB_DIR)/$(LIBS65):
+	@$(MAKE) -C ../ neslib
+
 # pc compiler targets
 
 PC_OBJS := $(foreach s,$(SRCS),$(OBJ_DIR)/$(s).pc.o)

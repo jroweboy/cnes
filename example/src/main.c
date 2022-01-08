@@ -16,4 +16,3 @@ void gameloop() {
         wait_for_frame_end();
     }
 }
-
