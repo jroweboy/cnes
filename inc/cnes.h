@@ -20,18 +20,29 @@
 #endif
 
 /// Driver code (handles game initialization)
+
 /**
  * @brief User provided initialization function. Called by the driver code
  * after the basic setup has happened. This is a good time for the user to
- * start drawing the background to the screen.
+ * start drawing the first background to the screen.
  */
 extern void init_callback();
 
 /**
- * @brief Called after initialization happens, this is the main loop!
- * This will be expected to never return on NES.
- * On PC after this returns, the game will terminate.
+ * @brief User provided callback, expected to run one frame of game logic.
+ * The user can check the `late_frame` variable provided to see if the NMI
+ * was fired before this function finished executing. In the case that the NMI
+ * fires while this function is still running, then `late_frame` will be set before
+ * runframe is called again.
+ * 
+ * On PC this function is expected to run to completion each frame.
  */
-extern void gameloop();
+extern void runframe();
+
+/**
+ * @brief Set to true when an NMI occurs during `runframe`. Can be checked if you
+ * need to have branching logic to prevent slowdowns
+ */
+extern bool late_frame;
 
 #endif // CNES_H

@@ -1,18 +1,13 @@
 
 #include "cnes.h"
 
-void callback_nmi() {
-    
+
+void init_callback() {
+
 }
 
-void gameloop() {
-    while (1) {
+void runframe() {
+    if (player1_pressed(PAD_A)) {
         update_joypad();
-
-        if (player1_pressed(PAD_A)) {
-            update_joypad();
-        }
-
-        wait_for_frame_end();
     }
 }

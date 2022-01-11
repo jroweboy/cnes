@@ -13,6 +13,7 @@
         "xtree": "c",
         "xutility": "c",
         "string": "c",
-        "string_view": "c"
+        "string_view": "c",
+        "stdbool.h": "c"
     }
 }

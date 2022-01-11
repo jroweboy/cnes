@@ -10,6 +10,7 @@ INC_DIR = ../inc
 LIB_DIR = ../lib
 OBJ_DIR = bin
 SRC_DIR = src
+AUDIO_DIR = ./assets/audio
 
 # nes compiler defines
 # CCFLAGS contains a few C optimizing flags
@@ -49,7 +50,7 @@ DIR = @mkdir -p $(@D)
 
 # default targets
 
-.PHONY: clean all default nes pc $(LIB_DIR)/cnes.pc.lib
+.PHONY: clean all default nes pc $(LIB_DIR)/cnes.pc.lib audio
 default: all
 
 clean:
@@ -62,6 +63,9 @@ nes: $(TITLE).nes
 
 OBJS := $(foreach s,$(SRCS),$(OBJ_DIR)/$(s).nes.o)
 NES_OBJS := $(foreach s,$(NES_SRCS),$(OBJ_DIR)/$(s).nes.o)
+AUDIO_SRC := $(wildcard $(AUDIO_DIR)/*.fms)
+AUDIO_OUT := $(OBJ_DIR)/audio/engine_build
+NES_OBJS += $(AUDIO_OUT).nes.o
 
 $(OBJ_DIR)/map.txt $(OBJ_DIR)/$(TITLE).dbg $(TITLE).nes: $(OBJS) $(NES_OBJS) $(LIB_DIR)/$(LIBS65)
 	$(DIR)
@@ -79,6 +83,15 @@ $(OBJ_DIR)/%.nes.s: $(SRC_DIR)/%.c
 
 $(LIB_DIR)/$(LIBS65):
 	@$(MAKE) -C ../ neslib
+
+# NES famistudio audio targets
+audio: $(AUDIO_OUT).nes.o
+$(AUDIO_OUT).s: $(AUDIO_SRC)
+	$(PY) ../scripts/generate_audio.py $(AUDIO_DIR) ./$(OBJ_DIR)/audio
+
+$(AUDIO_OUT).nes.o: $(AUDIO_OUT).s
+	$(DIR)
+	$(CA65) $(CFLAGS65) --create-dep $(@:.o=.d) -l $(@:.o=.lst) -o $@ $<
 
 # pc compiler targets
 

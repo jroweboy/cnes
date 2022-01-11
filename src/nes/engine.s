@@ -28,6 +28,11 @@ irq_y:          .res 1
 .globalzp irq_jmp_ptr
 .exportzp screen_jmp_abs, screen_jmp_ptr
 
+.segment "OAM"
+oam: .res 256
+
+.export _oam:=oam
+
 .bss
 ; Temp variables that should only be accessed in IRQs
 irq_tmp:        .res 1
@@ -44,7 +49,7 @@ irq_scanline:   .res 1
 .export irq_tmp, irq_tmp2, banka, bankc, screen_state, next_frame
 
 
-.code
+.segment "IRQ"
 
 .export InitIRQ
 
