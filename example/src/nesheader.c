@@ -11,3 +11,13 @@
 #pragma rodata-name(push, "INESHDR")
     NES2_HEADER();
 #pragma rodata-name(pop)
+
+#include "cnes.h"
+
+#pragma data-name(push, "VECTORS")
+const void const* vectors[3] = {
+    &driver_nmi,
+    &driver_reset,
+    &driver_irq
+};
+#pragma data-name(pop)

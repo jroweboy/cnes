@@ -76,6 +76,7 @@ def generate_engine(fin, fout):
   with open(f"{file_path}/famistudio_ca65.s", 'r') as file:
     engine = file.read()
   template = template.replace("{famistudio_segment_code}", os.linesep.join(segments))
+  template = template.replace("{famistudio_segment_code}", os.linesep.join(segments))
   template = template.replace("{famistudio_config_options}", os.linesep.join(config))
   template = template.replace("{famistudio_engine_code}", engine)
   with open(f"{fout}/engine_build.s", 'w') as file:

@@ -1,14 +1,33 @@
 
-; MMC3 registers
+
+; General Audio defines
+SONG_PAUSE      = 253
+SONG_STOP       = 254
+SONG_CLEAR      = 255
+SONG_PAUSED_MASK= %10000000
+
+; General Joypad defines
+JOYPAD1 = $4016
+JOYPAD2 = $4017
+
+; Common PPU defines
+PPUCTRL     = $2000
+PPUMASK     = $2001
+PPUSTATUS   = $2002
+OAMADDR     = $2003
+OAMDATA     = $2004
+PPUSCROLL   = $2005
+PPUADDR     = $2006
+PPUDATA     = $2007
+OAMDMA      = $4014
+
+; MMC3 registers / banking
 BANK_SELECT = $8000
 BANK_DATA   = $8001
 IRQLATCH    = $c000
 IRQRELOAD   = $c001
 IRQDISABLE  = $e000
 IRQENABLE   = $e001
-
-JOYPAD1 = $4016
-JOYPAD2 = $4017
 
 .macro BANK_CHR0 bank
   BANK_INNER bank, 0

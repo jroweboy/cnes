@@ -5,12 +5,6 @@
 #include "common_types.h"
 
 /**
- * @brief 
- * 
- */
-void __LIB_CALLSPEC wait_for_frame_end();
-
-/**
  * @brief User provided IRQ callback
  * 
  */
@@ -21,5 +15,9 @@ extern void irq_callback();
  * 
  */
 extern void nmi_callback();
+
+extern void (*driver_nmi)(void);
+extern void (*driver_reset)(void);
+extern void (*driver_irq)(void);
 
 #endif //CNES_ENGINE_H

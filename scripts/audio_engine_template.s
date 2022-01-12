@@ -8,7 +8,7 @@ FAMISTUDIO_CFG_C_BINDINGS = 0
 
 ; Segment handling
 ; Use some basic segment setup for common values
-.define FAMISTUDIO_CA65_ZP_SEGMENT   ZP
+.define FAMISTUDIO_CA65_ZP_SEGMENT   ZEROPAGE
 .define FAMISTUDIO_CA65_RAM_SEGMENT  BSS
 .define FAMISTUDIO_CA65_CODE_SEGMENT CODE
 
@@ -17,6 +17,12 @@ FAMISTUDIO_CFG_C_BINDINGS = 0
 {famistudio_segment_code}
 
 .code
+
+; Music list for the CNES engine
+{famistudio_music_list}
+
+; SFX list for the CNES engine
+{famistudio_sfx_list}
 
 ; Common default configuration options for the engine
 ; Can be overridden with compiler flags as needed

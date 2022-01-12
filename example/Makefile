@@ -12,16 +12,19 @@ OBJ_DIR = bin
 SRC_DIR = src
 AUDIO_DIR = ./assets/audio
 
+CNESLIB_NES = cnes.nes.lib
+CNESLIB_PC  = cnes.pc.lib
+
 # nes compiler defines
 # CCFLAGS contains a few C optimizing flags
 CFLAGS65 := -t nes -I $(INC_DIR) --bin-include-dir $(INC_DIR) -g -W1
 CCFLAGS65 := -t nes -I $(INC_DIR) --static-locals -Oirs -g
-LIBS65 := cnes.nes.lib
+LIBS65 := $(CNESLIB_NES)
 LDFLAGS65 := -L $(LIB_DIR)
 
 # pc compiler defines
 # debug
-LIBS := -L$(LIB_DIR) -lcnes.pc $(shell pkg-config --libs sdl2) -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lversion -luuid -lSetupapi
+LIBS := $(shell pkg-config --libs sdl2) -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lversion -luuid -lSetupapi -L$(LIB_DIR) -lcnes.pc 
 LDFLAGS := -static -static-libgcc
 CCFLAGS := $(shell pkg-config --cflags sdl2) -Wall -g -O0 -I$(INC_DIR)
 
@@ -50,7 +53,8 @@ DIR = @mkdir -p $(@D)
 
 # default targets
 
-.PHONY: clean all default nes pc $(LIB_DIR)/cnes.pc.lib audio
+.PHONY: clean all default nes pc audio
+
 default: all
 
 clean:
@@ -58,8 +62,17 @@ clean:
 
 all: nes pc
 
+LIB65_NES_SRC = $(wildcard ../src/nes/*) $(wildcard ../scripts/*) $(wildcard ../inc/*) ../Makefile
+# list foreign targets here
+$(LIB_DIR)/$(LIBS65): $(LIB65_NES_SRC)
+	@$(MAKE) --no-print-directory -C ../ neslib
+
+LIB65_PC_SRC = $(wildcard ../src/pc/*) $(wildcard ../scripts/*) $(wildcard ../inc/*) ../Makefile
+$(LIB_DIR)/cnes.pc.lib: $(LIB65_PC_SRC)
+	@$(MAKE) --no-print-directory -C ../ pclib
+
 # NES compiler targets
-nes: $(TITLE).nes
+nes: $(OBJ_DIR)/$(TITLE).nes
 
 OBJS := $(foreach s,$(SRCS),$(OBJ_DIR)/$(s).nes.o)
 NES_OBJS := $(foreach s,$(NES_SRCS),$(OBJ_DIR)/$(s).nes.o)
@@ -67,9 +80,9 @@ AUDIO_SRC := $(wildcard $(AUDIO_DIR)/*.fms)
 AUDIO_OUT := $(OBJ_DIR)/audio/engine_build
 NES_OBJS += $(AUDIO_OUT).nes.o
 
-$(OBJ_DIR)/map.txt $(OBJ_DIR)/$(TITLE).dbg $(TITLE).nes: $(OBJS) $(NES_OBJS) $(LIB_DIR)/$(LIBS65)
+$(OBJ_DIR)/map.txt $(OBJ_DIR)/$(TITLE).dbg $(OBJ_DIR)/$(TITLE).nes: $(OBJS) $(NES_OBJS) $(LIB_DIR)/$(CNESLIB_NES) src/nes.cfg
 	$(DIR)
-	$(LD65) -o $(TITLE).nes -m $(OBJ_DIR)/map.txt --dbgfile $(OBJ_DIR)/$(TITLE).dbg -C src/nes.cfg $(LDFLAGS65) --start-group $^ $(LIBS65) --end-group
+	$(LD65) -o $(OBJ_DIR)/$(TITLE).nes -m $(OBJ_DIR)/map.txt --dbgfile $(OBJ_DIR)/$(TITLE).dbg -C src/nes.cfg $(LDFLAGS65) --start-group $(OBJS) $(NES_OBJS)  $(LIBS65) --end-group
 
 $(OBJ_DIR)/%.nes.o: $(OBJ_DIR)/%.nes.s
 	$(DIR)
@@ -81,12 +94,11 @@ $(OBJ_DIR)/%.nes.s: $(SRC_DIR)/%.c
 
 -include $(OBJS:%.nes.o=%.nes.d)
 
-$(LIB_DIR)/$(LIBS65):
-	@$(MAKE) -C ../ neslib
 
 # NES famistudio audio targets
 audio: $(AUDIO_OUT).nes.o
-$(AUDIO_OUT).s: $(AUDIO_SRC)
+
+$(AUDIO_OUT).s: $(AUDIO_SRC) $(wildcard ../scripts/*)
 	$(PY) ../scripts/generate_audio.py $(AUDIO_DIR) ./$(OBJ_DIR)/audio
 
 $(AUDIO_OUT).nes.o: $(AUDIO_OUT).s
@@ -98,17 +110,14 @@ $(AUDIO_OUT).nes.o: $(AUDIO_OUT).s
 PC_OBJS := $(foreach s,$(SRCS),$(OBJ_DIR)/$(s).pc.o)
 DEPFLAGS = -MF $(patsubst %.pc.o,%.pc.d,$@) -MMD -MP
 
-pc: $(TITLE_EXE)
+pc: $(OBJ_DIR)/$(TITLE_EXE)
 
-$(TITLE_EXE): $(PC_OBJS) $(LIB_DIR)/cnes.pc.lib
+$(OBJ_DIR)/$(TITLE_EXE): $(PC_OBJS) $(LIB_DIR)/$(CNESLIB_PC)
 	$(DIR)
-	$(CC) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(CC) $(LDFLAGS) $(PC_OBJS) $(LIBS) -o $@
 
 $(OBJ_DIR)/%.pc.o: $(SRC_DIR)/%.c
 	$(DIR)
 	$(CC) $(DEPFLAGS) -c $(CCFLAGS) $< -o $@
 
 -include $(PC_OBJS:%.pc.o=%.pc.d)
-
-$(LIB_DIR)/cnes.pc.lib:
-	@$(MAKE) -C ../ pclib

@@ -1,21 +1,14 @@
 
 .include "common.s"
-.include "common_ppu.s"
-
-; Import user defined functions
-.import _init_callback, _gameloop
 
 ; Import driver defined values
-.import oam
-.import HandleIRQ, HandleNMI
-
-.segment "VECTORS"
-.word (HandleNMI)
-.word (Reset)
-.word (HandleIRQ)
+.global oam
 
 .code
 
+.import GameLoop, InitEngine
+
+.export _driver_reset:=Reset
 .proc Reset
   sei       ; mask interrupts
   cld       ; disable decimal mode
@@ -64,9 +57,6 @@
 
   ldx #0
   stx $a000 ; Vertical mirroring
-  
-  ; BANK_PRGA #_INITIAL_CODE_BANK_A
-  ; BANK_PRGC #_INITIAL_CODE_BANK_C
 
   ; disable scanline IRQ
   sta IRQDISABLE
@@ -75,8 +65,8 @@
   ; enable the NMI for graphical updates, and jump to our main program
   lda #%10001000
   sta PPUCTRL
-  jsr _init_callback
-  jmp _gameloop
+  jsr InitEngine
+  jmp GameLoop
   ; endless loop
 .endproc
 

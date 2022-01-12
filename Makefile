@@ -3,7 +3,7 @@
 TITLE = cnes
 
 SRCS =
-NES_SRCS = common driver engine joypad
+NES_SRCS = common driver engine joypad audio
 NES_SRCS_C = nes
 
 PC_SRCS_C = sdl joypad
