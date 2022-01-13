@@ -4,6 +4,7 @@
 # and generates the ASM file that we can link against for Engine data
 
 import argparse
+import functools
 import os
 import pathlib
 import subprocess
@@ -17,13 +18,46 @@ def fm(*args):
 def export_engine(fin, fout):
   fin = pathlib.Path(fin).resolve()
   fout = pathlib.Path(fout).resolve()
+  # export the engine to a single file to get the list of all the songs
+  # that way we can split the sfx songs from the music songs
+  fm(str(fin), 
+    "famistudio-asm-export",
+    f"{fout}/all_project.s",
+    "-famistudio-asm-format:ca65",
+    "-famistudio-generate-list"
+    )
+  song_indicies = []
+  sfx_indicies = []
+  with open(f"{fout}/all_project_songlist.inc", 'r') as file:
+    data = file.read().splitlines()
+    for line in data:
+      if line.startswith("song_max"):
+        break
+      elif line.startswith('song_sfx'):
+        sfx_indicies += [line[line.rfind(" ")+1:]]
+      elif line.startswith('song_'):
+        song_indicies += [line[line.rfind(" ")+1:]]
+
+  os.remove(f"{fout}/all_project_songlist.inc")
+  os.remove(f"{fout}/all_project.dmc")
+  os.remove(f"{fout}/all_project.s")
+
+  print(f"Exporting SFX (project indicies: {sfx_indicies})")
+  print(fm(str(fin),
+    "famistudio-asm-sfx-export",
+    f"{fout}/sfx.s",
+    f"-export-songs:{','.join(sfx_indicies)}",
+    "-famistudio-asm-format:ca65",
+    "-famistudio-sfx-generate-list"))
+
+  print(f"Exporting songs (project indicies: {song_indicies})")
   return fm(str(fin),
     "famistudio-asm-export",
     f"{fout}/",
+    f"-export-songs:{','.join(song_indicies)}",
     "-famistudio-asm-seperate-files",
     "-famistudio-asm-format:ca65",
-    "-famistudio-asm-generate-list",
-    "-famistudio-asm-sfx-generate-list")
+    "-famistudio-generate-list")
 
 def export_ogg(fin, fout):
   fin = pathlib.Path(fin).resolve()
@@ -59,6 +93,7 @@ def generate_engine(fin, fout):
       if 'Total dmc file size' in line:
         segments.add(f'''
 .segment "AUDIO_{project_name}_dmc"
+{project_name}_dmc:
 .incbin "./{project_name}.dmc"''')
       # parse the cmd_output and grab any FAMISTUDIO_CONFIG vars and put them
       # into the template
@@ -70,13 +105,54 @@ def generate_engine(fin, fout):
   if not config or not segments:
     raise Exception("Unable to load any audio files")
 
+  if pathlib.Path(fout).exists():
+    segments.add(f'''
+.segment "SFX_sfx"
+.include "sfx.s"''')
+
+  # Load the generated include files to get the name of the exported songs
+  song_data = []
+  songs = []
+  for file in fout.rglob('*_songlist.inc'):
+    with open(file) as f:
+      songs += [file.stem[0:file.stem.find("_songlist")]]
+      song_name = f.read().splitlines()[0]
+      name = song_name[song_name.find("song_")+5:song_name.find(" =")]
+      project_name = file.stem[0:file.stem.find(f"_{name}")]
+      song_data += [{
+        "banka": f".lobyte(.bank(music_data_{name}))",
+        "bankc": f".lobyte(.bank({project_name}_dmc))",
+        "addrhi": f".hibyte(music_data_{name})",
+        "addrlo": f".lobyte(music_data_{name})",
+      }]
+
+  song_data = functools.reduce(lambda a,b: {
+        "banka": ", ".join([a['banka'],b['banka']]),
+        "bankc": ", ".join([a['bankc'],b['bankc']]),
+        "addrhi": ", ".join([a['addrhi'],b['addrhi']]),
+        "addrlo": ", ".join([a['addrlo'],b['addrlo']]),
+      }, song_data)
+  
+  song_data_template = f"""
+.export MusicBank_A, MusicBank_C, MusicAddrHi, MusicAddrLo
+MusicBank_A: .byte {song_data['banka']}
+MusicBank_C: .byte {song_data['bankc']}
+MusicAddrHi: .byte {song_data['addrhi']}
+MusicAddrLo: .byte {song_data['addrlo']}"""
+
+  # now load the .s files for each of the songs to find the dmc sound effects
+  for song in songs:
+    with open(f"{fout}/{song}.s", 'r') as file:
+      template = file.read()
+
+
   # write the data to the template file
   with open(f"{file_path}/audio_engine_template.s", 'r') as file:
     template = file.read()
   with open(f"{file_path}/famistudio_ca65.s", 'r') as file:
     engine = file.read()
   template = template.replace("{famistudio_segment_code}", os.linesep.join(segments))
-  template = template.replace("{famistudio_segment_code}", os.linesep.join(segments))
+  template = template.replace("{famistudio_music_list}", song_data_template)
   template = template.replace("{famistudio_config_options}", os.linesep.join(config))
   template = template.replace("{famistudio_engine_code}", engine)
   with open(f"{fout}/engine_build.s", 'w') as file:
