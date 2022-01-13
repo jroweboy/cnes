@@ -20,18 +20,9 @@ extern volatile u8 player1_prev;
 extern volatile u8 player1_curr;
 extern volatile u8 player1_pres;
 extern volatile u8 player1_rele;
-#define player1_pressed(button)\
-  (__A__ = (button),\
-  asm("and %v", player1_pres),\
-  __A__)
-#define player1_held(button)\
-  (__A__ = (button),\
-  asm("and %v", player1_curr),\
-  __A__)
-#define player1_released(button)\
-  (__A__ = (button),\
-  asm("and %v", player1_rele),\
-  __A__)
+#define player1_pressed(button) ((u8)(button) & player1_pres)
+#define player1_held(button) ((u8)(button) & player1_curr)
+#define player1_released(button) ((u8)(button) & player1_rele)
 #else
 bool __LIB_CALLSPEC player1_pressed(u8 buttons);
 bool __LIB_CALLSPEC player1_held(u8 buttons);
@@ -40,9 +31,19 @@ bool __LIB_CALLSPEC player1_released(u8 buttons);
 
 #ifdef CNES_JOYPAD_PLAYER2
 
+#ifdef __NES__
+extern volatile u8 player2_prev;
+extern volatile u8 player2_curr;
+extern volatile u8 player2_pres;
+extern volatile u8 player2_rele;
+#define player2_pressed(button) ((u8)(button) & player2_pres)
+#define player2_held(button) ((u8)(button) & player2_curr)
+#define player2_released(button) ((u8)(button) & player2_rele)
+#else
 bool __LIB_CALLSPEC player2_pressed(u8 button);
 bool __LIB_CALLSPEC player2_held(u8 button);
 bool __LIB_CALLSPEC player2_released(u8 button);
+#endif //__NES__
 
 #endif //CNES_JOYPAD_PLAYER2
 

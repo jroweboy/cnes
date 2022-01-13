@@ -6,7 +6,7 @@ SRCS =
 NES_SRCS = common driver engine joypad audio
 NES_SRCS_C = nes
 
-PC_SRCS_C = sdl joypad
+PC_SRCS_C = sdl joypad audio renderer
 
 DIR = @mkdir -p $(@D)
 INC_DIR = inc
@@ -23,8 +23,8 @@ CCFLAGS65 := -t nes -I $(INC_DIR) --static-locals -Oirs -g
 
 # pc compiler defines
 # debug
-LIBS := $(shell pkg-config --libs sdl2)
-CCFLAGS := $(shell pkg-config --cflags sdl2) -Wall -g -O0 -I$(INC_DIR)
+LIBS := $(shell pkg-config --libs --static ogg sdl2 sdl2_mixer)
+CCFLAGS := $(shell pkg-config --cflags sdl2 sdl2_mixer) -Wall -g -O0 -I$(INC_DIR)
 
 # release
 #LIBS := $(shell pkg-config --libs sdl2)

@@ -4,35 +4,29 @@
 
 #include "common_types.h"
 
+#ifdef __NES__
+extern volatile u8 music_queue;
+extern volatile u8 music_playing;
 /**
  * @brief Starts playing music based on the track number provided.
  * The audio will continue to loop until either stop music is called
  * or start_music is called with a new track
  * 
  * @param song - Track ID for the audio to play.
- * 
- * Usage:
- * music_queue = CNES_MUSIC_*;
- * // where the * is an index into the generated music list
  */
-extern volatile u8 music_queue;
-extern volatile u8 music_playing;
+#define music_start(song) (music_queue = (song))
 
 /**
  * @brief Pauses or unpauses the current music track
- * 
- * Usage:
- * music_queue = CNES_MUSIC_PAUSE;
  */
 #define CNES_MUSIC_PAUSE ((u8)253)
+#define music_pause() (music_queue = (CNES_MUSIC_PAUSE))
 
 /**
  * @brief Stops music playback.
- * 
- * Usage:
- * music_queue = CNES_MUSIC_STOP;
  */
 #define CNES_MUSIC_STOP ((u8)254)
+#define music_stop() (music_queue = (CNES_MUSIC_STOP))
 
 
 /**
@@ -42,5 +36,19 @@ extern volatile u8 music_playing;
  */
 extern volatile u8 sfx_queue;
 void __LIB_CALLSPEC sfx_play(u8 sfx);
+
+#else
+extern const char* song_list[];
+
+void __LIB_CALLSPEC music_start(u8 song);
+
+void __LIB_CALLSPEC music_pause();
+
+void __LIB_CALLSPEC music_stop();
+
+void __LIB_CALLSPEC sfx_play(u8 sfx);
+
+#endif //__NES__
+
 
 #endif //CNES_AUDIO_H

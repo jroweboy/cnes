@@ -24,9 +24,11 @@ LDFLAGS65 := -L $(LIB_DIR)
 
 # pc compiler defines
 # debug
-LIBS := $(shell pkg-config --libs sdl2) -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lversion -luuid -lSetupapi -L$(LIB_DIR) -lcnes.pc 
-LDFLAGS := -static -static-libgcc
-CCFLAGS := $(shell pkg-config --cflags sdl2) -Wall -g -O0 -I$(INC_DIR)
+SDL_LIB_FLAGS:=$(shell pkg-config --libs-only-l ogg sdl2 sdl2_mixer)
+SDL_LIB_FLAGS_L:=$(shell pkg-config --libs-only-L ogg sdl2 sdl2_mixer)
+LIBS := -L$(LIB_DIR) $(SDL_LIB_FLAGS_L) -Wl,--start-group -lcnes.pc $(SDL_LIB_FLAGS) -Wl,--end-group
+LDFLAGS := -Wl,-subsystem,windows
+CCFLAGS := $(shell pkg-config --cflags ogg sdl2 sdl2_mixer) -Wall -g -O0 -I$(INC_DIR)
 
 # release
 #LIBS := $(shell pkg-config --libs sdl2)
@@ -112,12 +114,22 @@ DEPFLAGS = -MF $(patsubst %.pc.o,%.pc.d,$@) -MMD -MP
 
 pc: $(OBJ_DIR)/$(TITLE_EXE)
 
-$(OBJ_DIR)/$(TITLE_EXE): $(PC_OBJS) $(LIB_DIR)/$(CNESLIB_PC)
+DLLS:= $(OBJ_DIR)/SDL2.dll $(OBJ_DIR)/SDL2_mixer.dll \
+	$(OBJ_DIR)/libFLAC-8.dll $(OBJ_DIR)/libmpg123-0.dll \
+	$(OBJ_DIR)/libopusfile-0.dll $(OBJ_DIR)/libvorbisfile-3.dll \
+	$(OBJ_DIR)/libssp-0.dll $(OBJ_DIR)/libogg-0.dll $(OBJ_DIR)/libopus-0.dll \
+	$(OBJ_DIR)/libvorbis-0.dll
+
+$(OBJ_DIR)/$(TITLE_EXE): $(PC_OBJS) $(LIB_DIR)/$(CNESLIB_PC) $(DLLS)
 	$(DIR)
-	$(CC) $(LDFLAGS) $(PC_OBJS) $(LIBS) -o $@
+	$(CC) $(PC_OBJS) -o $@ $(LDFLAGS) $(LIBS)
 
 $(OBJ_DIR)/%.pc.o: $(SRC_DIR)/%.c
 	$(DIR)
-	$(CC) $(DEPFLAGS) -c $(CCFLAGS) $< -o $@
+	$(CC) $(DEPFLAGS) -o $@ -c $(CCFLAGS) $<
+
+# copy DLLs to the exe folder
+$(OBJ_DIR)/%.dll:
+	@cp -f /mingw64/$@ $@
 
 -include $(PC_OBJS:%.pc.o=%.pc.d)
