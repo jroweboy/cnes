@@ -18,6 +18,7 @@ def fm(*args):
 def export_engine(fin, fout):
   fin = pathlib.Path(fin).resolve()
   fout = pathlib.Path(fout).resolve()
+  project_name = fin.stem
   # export the engine to a single file to get the list of all the songs
   # that way we can split the sfx songs from the music songs
   fm(str(fin), 
@@ -45,10 +46,17 @@ def export_engine(fin, fout):
   print(f"Exporting SFX (project indicies: {sfx_indicies})")
   print(fm(str(fin),
     "famistudio-asm-sfx-export",
-    f"{fout}/sfx.s",
+    f"{fout}/{project_name}_sfx.s",
     f"-export-songs:{','.join(sfx_indicies)}",
     "-famistudio-asm-format:ca65",
     "-famistudio-sfx-generate-list"))
+
+  # FIXUP: replace `sounds` inside the sfx file with a project specific name
+  with open(f"{fout}/{project_name}_sfx.s", 'r') as f:
+    s = f.read()
+  s = s.replace("sounds", f"{project_name}_sfx")
+  with open(f"{fout}/{project_name}_sfx.s", 'w') as f:
+    f.write(s)
 
   print(f"Exporting songs (project indicies: {song_indicies})")
   return fm(str(fin),
@@ -56,6 +64,8 @@ def export_engine(fin, fout):
     f"{fout}/",
     f"-export-songs:{','.join(song_indicies)}",
     "-famistudio-asm-seperate-files",
+    f"-famistudio-asm-seperate-song-pattern:{project_name}_{{song}}",
+    f"-famistudio-asm-seperate-dmc-pattern:{project_name}",
     "-famistudio-asm-format:ca65",
     "-famistudio-generate-list")
 
@@ -89,7 +99,8 @@ def generate_engine(fin, fout):
         song_name = line[line.find('Song \'')+6:line.find('\' size')]
         segments.add(f'''
 .segment "AUDIO_{project_name}_{song_name}"
-.include "{project_name}_{song_name}.s"''')
+.include "{project_name}_{song_name}.s"
+.include "{project_name}_sfx.s"''')
       if 'Total dmc file size' in line:
         segments.add(f'''
 .segment "AUDIO_{project_name}_dmc"
@@ -105,11 +116,6 @@ def generate_engine(fin, fout):
   if not config or not segments:
     raise Exception("Unable to load any audio files")
 
-  if pathlib.Path(fout).exists():
-    segments.add(f'''
-.segment "SFX_sfx"
-.include "sfx.s"''')
-
   # Load the generated include files to get the name of the exported songs
   song_data = []
   songs = []
@@ -124,6 +130,8 @@ def generate_engine(fin, fout):
         "bankc": f".lobyte(.bank({project_name}_dmc))",
         "addrhi": f".hibyte(music_data_{name})",
         "addrlo": f".lobyte(music_data_{name})",
+        "sfxhi": f".hibyte({project_name}_sfx)",
+        "sfxlo": f".lobyte({project_name}_sfx)",
       }]
 
   song_data = functools.reduce(lambda a,b: {
@@ -131,20 +139,23 @@ def generate_engine(fin, fout):
         "bankc": ", ".join([a['bankc'],b['bankc']]),
         "addrhi": ", ".join([a['addrhi'],b['addrhi']]),
         "addrlo": ", ".join([a['addrlo'],b['addrlo']]),
+        "sfxhi": ", ".join([a['sfxhi'],b['sfxhi']]),
+        "sfxlo": ", ".join([a['sfxlo'],b['sfxlo']]),
       }, song_data)
   
   song_data_template = f"""
-.export MusicBank_A, MusicBank_C, MusicAddrHi, MusicAddrLo
+.export MusicBank_A, MusicBank_C, MusicAddrHi, MusicAddrLo, SFXAddrHi, SFXAddrLo
 MusicBank_A: .byte {song_data['banka']}
 MusicBank_C: .byte {song_data['bankc']}
 MusicAddrHi: .byte {song_data['addrhi']}
-MusicAddrLo: .byte {song_data['addrlo']}"""
+MusicAddrLo: .byte {song_data['addrlo']}
+SFXAddrHi:   .byte {song_data['sfxhi']}
+SFXAddrLo:   .byte {song_data['sfxlo']}"""
 
   # now load the .s files for each of the songs to find the dmc sound effects
   for song in songs:
     with open(f"{fout}/{song}.s", 'r') as file:
       template = file.read()
-
 
   # write the data to the template file
   with open(f"{file_path}/audio_engine_template.s", 'r') as file:

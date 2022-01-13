@@ -19,6 +19,11 @@
 #include "engine.h"
 #endif
 
+/// Engine provides callbacks for NMI and IRQs.
+#if CNES_AUDIO
+#include "audio.h"
+#endif
+
 /// Driver code (handles game initialization)
 
 /**

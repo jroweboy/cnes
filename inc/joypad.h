@@ -15,9 +15,28 @@
 
 void __LIB_CALLSPEC update_joypad(void);
 
+#ifdef __NES__
+extern volatile u8 player1_prev;
+extern volatile u8 player1_curr;
+extern volatile u8 player1_pres;
+extern volatile u8 player1_rele;
+#define player1_pressed(button)\
+  (__A__ = (button),\
+  asm("and %v", player1_pres),\
+  __A__)
+#define player1_held(button)\
+  (__A__ = (button),\
+  asm("and %v", player1_curr),\
+  __A__)
+#define player1_released(button)\
+  (__A__ = (button),\
+  asm("and %v", player1_rele),\
+  __A__)
+#else
 bool __LIB_CALLSPEC player1_pressed(u8 buttons);
 bool __LIB_CALLSPEC player1_held(u8 buttons);
 bool __LIB_CALLSPEC player1_released(u8 buttons);
+#endif //__NES__
 
 #ifdef CNES_JOYPAD_PLAYER2
 

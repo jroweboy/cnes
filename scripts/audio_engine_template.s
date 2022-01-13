@@ -21,9 +21,6 @@ FAMISTUDIO_CFG_C_BINDINGS = 0
 ; Music list for the CNES engine
 {famistudio_music_list}
 
-; SFX list for the CNES engine
-{famistudio_sfx_list}
-
 ; Common default configuration options for the engine
 ; Can be overridden with compiler flags as needed
 ; Example: ca65 -DFAMISTUDIO_CFG_DPCM_SUPPORT=0

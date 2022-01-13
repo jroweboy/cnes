@@ -1,9 +1,9 @@
 
 
 ; General Audio defines
-SONG_PAUSE      = 253
-SONG_STOP       = 254
-SONG_CLEAR      = 255
+SONG_PAUSE      = 254
+SONG_STOP       = 255
+SONG_CLEAR      = 0
 SONG_PAUSED_MASK= %10000000
 
 ; General Joypad defines

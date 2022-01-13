@@ -9,6 +9,7 @@ sfx_queue:        .res 1
 
 ; Holds the CNES value for the currently playing audio
 music_current:    .res 1
+.export _music_playing:=music_current
 ; Variables to store the famistudio information for the currently playing audio track
 music_banka:      .res 1
 music_bankc:      .res 1
@@ -36,28 +37,34 @@ sfx_id:           .res 1
   BANK_PRGC bankc
 .endmacro
 
-.macro MacroLoadMusicTrack
+.proc LoadMusicProject
   ; X = which CNES track to load
-  lda MusicBank_A,x
-  sta music_banka
-  lda MusicBank_C,x
-  sta music_bankc
   txa
+  pha
+    lda MusicBank_A-1,x
+    sta music_banka
+    lda MusicBank_C-1,x
+    sta music_bankc
+    BANK_PRGA music_banka
+    BANK_PRGC music_bankc
+    txa
+    tay
+    lda MusicAddrHi-1,x
+    ldx MusicAddrLo-1,y
+    tay
+    lda #1
+    ; A = 1(NTSC); X = Lo; Y = Hi
+    jsr famistudio_init
+  pla
+  tax
   tay
-  lda MusicAddrLo,x
-  ldx MusicAddrHi,y
+  lda SFXAddrHi-1,x
+  ldx SFXAddrLo-1,y
   tay
-.endmacro
-.macro MacroLoadSFXTrack
-  ; X = which CNES track to load
-  lda SFXId,x
-  sta sfx_id
-  txa
-  tay
-  lda SFXAddrLo,x
-  ldx SFXAddrHi,y
-  tay
-.endmacro
+  ; X = lo; Y = Hi
+  jmp famistudio_sfx_init
+  ; rts
+.endproc
 
 .export InitMusic
 .proc InitMusic
@@ -67,25 +74,18 @@ sfx_id:           .res 1
   lda #0
   sta sfx_queue
 
-  ldx #0 ; By default, load the init with the first song in the music list
-  MacroLoadMusicTrack
-  lda #1 ; NTSC ; TODO support other formats
-  ; A = NTSC
-  ; X = MusicAddrHi
-  ; Y = MusicAddrLo
-  jsr famistudio_init
-
-  MacroLoadSFXTrack
-  jmp famistudio_sfx_init
+  ; By default, load the init with the first song in the music list
+  ldx #0
+  jmp LoadMusicProject
   ;rts
 .endproc
 
 .macro MacroMusicUpdate
 .scope Music
   lda music_queue
+  beq Exit
+  ; New song to play so let it run
   bpl MusicPlay
-  cmp #SONG_CLEAR 
-    beq Exit
   cmp #SONG_STOP
     beq MusicStop
   ; assume paused since its the only other status
@@ -105,18 +105,20 @@ MusicPause:
     sta music_current
     lda #0
     jsr famistudio_music_pause
-    bne ClearQueue ;should be unconditional
-
+    jmp ClearQueue
 MusicStop:
   lda #SONG_CLEAR
   sta music_current
   jsr famistudio_music_stop
+  jmp ClearQueue
 
 MusicPlay:
   sta music_current
   ; load the data for this music track
   tax
-  MacroLoadMusicTrack
+  jsr LoadMusicProject
+  ; we expect all audio tracks to be in their own projects
+  lda #0
   jsr famistudio_music_play
 
 ClearQueue:

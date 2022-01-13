@@ -16,6 +16,7 @@
  * // where the * is an index into the generated music list
  */
 extern volatile u8 music_queue;
+extern volatile u8 music_playing;
 
 /**
  * @brief Pauses or unpauses the current music track

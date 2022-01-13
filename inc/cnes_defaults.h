@@ -18,4 +18,9 @@
 #define CNES_ENGINE 1
 #endif
 
+#ifndef CNES_AUDIO
+// enable audio engine
+#define CNES_AUDIO 1
+#endif
+
 #endif //CNES_DEFAULTS_H

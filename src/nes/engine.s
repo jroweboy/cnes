@@ -55,6 +55,8 @@ wait_for_nmi:   .res 1
 .export InitEngine
 .proc InitEngine
   jsr InitMusic
+  lda #1
+  sta nmi_lock
   jmp _init_callback
   ; rts
 .endproc
@@ -67,7 +69,9 @@ wait_for_nmi:   .res 1
   sta wait_for_nmi
   :
     ldx next_frame
-  bpl :-
+  beq :-
+  lda #0
+  sta next_frame
   jmp GameLoop
 .endproc
 
@@ -79,16 +83,15 @@ SCANLINE_NMI           = 0
   sta irq_a
   lda PPUSTATUS       ; Clear the NMI flag
   lda nmi_lock
-  bne EarlyExit
+  beq EarlyExit
   ; save registers. A was already saved above
   stx irq_x
   sty irq_y
   ; jsr DrawingNMICallback
-  jsr PrepareNextScreen
+  ; jsr PrepareNextScreen
   jsr UpdateMusic
-  inc next_frame
-  ; unlock re-entry flag
-  lda #0
+  lda #1
+  sta next_frame
   sta nmi_lock
   ; restore registers and return
   ldy irq_y
