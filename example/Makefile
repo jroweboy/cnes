@@ -8,7 +8,13 @@ NES_SRCS = nesheader
 # user defined paths
 INC_DIR = ../inc
 LIB_DIR = ../lib
-OBJ_DIR = bin
+BIN_DIR = build
+NES_OBJ_DIR = $(BIN_DIR)/nes/obj
+NES_BIN_DIR = $(BIN_DIR)/nes/bin
+NES_GEN_DIR = $(BIN_DIR)/nes/gen
+PC_BIN_DIR = $(BIN_DIR)/pc/bin
+PC_OBJ_DIR = $(BIN_DIR)/pc/obj
+PC_GEN_DIR = $(BIN_DIR)/pc/gen
 SRC_DIR = src
 AUDIO_DIR = ./assets/audio
 
@@ -17,8 +23,8 @@ CNESLIB_PC  = cnes.pc.lib
 
 # nes compiler defines
 # CCFLAGS contains a few C optimizing flags
-CFLAGS65 := -t nes -I $(INC_DIR) --bin-include-dir $(INC_DIR) -g -W1
-CCFLAGS65 := -t nes -I $(INC_DIR) --static-locals -Oirs -g
+CFLAGS65 := -t nes -I $(INC_DIR) -I $(NES_GEN_DIR) --bin-include-dir $(INC_DIR) -g -W1
+CCFLAGS65 := -t nes -I $(INC_DIR) -I $(NES_GEN_DIR) --static-locals -Oirs -g
 LIBS65 := $(CNESLIB_NES)
 LDFLAGS65 := -L $(LIB_DIR)
 
@@ -28,7 +34,7 @@ SDL_LIB_FLAGS:=$(shell pkg-config --libs-only-l ogg sdl2 sdl2_mixer)
 SDL_LIB_FLAGS_L:=$(shell pkg-config --libs-only-L ogg sdl2 sdl2_mixer)
 LIBS := -L$(LIB_DIR) $(SDL_LIB_FLAGS_L) -Wl,--start-group -lcnes.pc $(SDL_LIB_FLAGS) -Wl,--end-group
 LDFLAGS := -Wl,-subsystem,windows
-CCFLAGS := $(shell pkg-config --cflags ogg sdl2 sdl2_mixer) -Wall -g -O0 -I$(INC_DIR)
+CCFLAGS := $(shell pkg-config --cflags ogg sdl2 sdl2_mixer) -Wall -g -O0 -I$(INC_DIR) -I$(PC_GEN_DIR)
 
 # release
 #LIBS := $(shell pkg-config --libs sdl2)
@@ -60,7 +66,7 @@ DIR = @mkdir -p $(@D)
 default: all
 
 clean:
-	-rm -rf $(OBJ_DIR)/*
+	-rm -rf $(BIN_DIR)/*
 
 all: nes pc
 
@@ -74,62 +80,77 @@ $(LIB_DIR)/cnes.pc.lib: $(LIB65_PC_SRC)
 	@$(MAKE) --no-print-directory -C ../ pclib
 
 # NES compiler targets
-nes: $(OBJ_DIR)/$(TITLE).nes
+nes: $(NES_BIN_DIR)/$(TITLE).nes
 
-OBJS := $(foreach s,$(SRCS),$(OBJ_DIR)/$(s).nes.o)
-NES_OBJS := $(foreach s,$(NES_SRCS),$(OBJ_DIR)/$(s).nes.o)
+OBJS := $(foreach s,$(SRCS),$(NES_OBJ_DIR)/$(s).o)
+NES_OBJS := $(foreach s,$(NES_SRCS),$(NES_OBJ_DIR)/$(s).o)
 AUDIO_SRC := $(wildcard $(AUDIO_DIR)/*.fms)
-AUDIO_OUT := $(OBJ_DIR)/audio/engine_build
-NES_OBJS += $(AUDIO_OUT).nes.o
+NES_AUDIO_OUT := $(NES_GEN_DIR)/audio/engine_build
+NES_OBJS += $(NES_AUDIO_OUT).o
 
-$(OBJ_DIR)/map.txt $(OBJ_DIR)/$(TITLE).dbg $(OBJ_DIR)/$(TITLE).nes: $(OBJS) $(NES_OBJS) $(LIB_DIR)/$(CNESLIB_NES) src/nes.cfg
+$(NES_BIN_DIR)/map.txt $(NES_BIN_DIR)/$(TITLE).dbg $(NES_BIN_DIR)/$(TITLE).nes: $(OBJS) $(NES_OBJS) $(LIB_DIR)/$(CNESLIB_NES) $(SRC_DIR)/nes.cfg
 	$(DIR)
-	$(LD65) -o $(OBJ_DIR)/$(TITLE).nes -m $(OBJ_DIR)/map.txt --dbgfile $(OBJ_DIR)/$(TITLE).dbg -C src/nes.cfg $(LDFLAGS65) --start-group $(OBJS) $(NES_OBJS)  $(LIBS65) --end-group
+	$(LD65) -o $(NES_BIN_DIR)/$(TITLE).nes -m $(NES_BIN_DIR)/map.txt --dbgfile $(NES_BIN_DIR)/$(TITLE).dbg -C src/nes.cfg $(LDFLAGS65) --start-group $(OBJS) $(NES_OBJS)  $(LIBS65) --end-group
 
-$(OBJ_DIR)/%.nes.o: $(OBJ_DIR)/%.nes.s
+$(NES_OBJ_DIR)/%.o: $(NES_OBJ_DIR)/%.s
 	$(DIR)
 	$(CA65) $(CFLAGS65) --create-dep $(@:.o=.d) -l $(@:.o=.lst) -o $@ $<
 
-$(OBJ_DIR)/%.nes.s: $(SRC_DIR)/%.c
+$(NES_OBJ_DIR)/%.s: $(SRC_DIR)/%.c $(NES_AUDIO_OUT).h
 	$(DIR)
 	$(CC65) $(CCFLAGS65) -o $@ $<
 
--include $(OBJS:%.nes.o=%.nes.d)
-
+-include $(NES_OBJS:%.o=%.d)
 
 # NES famistudio audio targets
-audio: $(AUDIO_OUT).nes.o
+audio: nes_audio pc_audio
 
-$(AUDIO_OUT).s: $(AUDIO_SRC) $(wildcard ../scripts/*)
-	$(PY) ../scripts/generate_audio.py $(AUDIO_DIR) ./$(OBJ_DIR)/audio
+nes_audio: $(NES_AUDIO_OUT).o
 
-$(AUDIO_OUT).nes.o: $(AUDIO_OUT).s
+$(NES_AUDIO_OUT).s $(NES_AUDIO_OUT).h: $(AUDIO_SRC) $(wildcard ../scripts/*)
+	$(PY) ../scripts/generate_audio.py -n $(AUDIO_DIR) $(NES_GEN_DIR)/audio/
+
+$(NES_AUDIO_OUT).o: $(NES_AUDIO_OUT).s
 	$(DIR)
 	$(CA65) $(CFLAGS65) --create-dep $(@:.o=.d) -l $(@:.o=.lst) -o $@ $<
 
 # pc compiler targets
 
-PC_OBJS := $(foreach s,$(SRCS),$(OBJ_DIR)/$(s).pc.o)
-DEPFLAGS = -MF $(patsubst %.pc.o,%.pc.d,$@) -MMD -MP
+PC_OBJS := $(foreach s,$(SRCS),$(PC_OBJ_DIR)/$(s).o)
+PC_OBJS += $(PC_OBJ_DIR)/pc_build.o
+DEPFLAGS = -MF $(patsubst %.o,%.d,$@) -MMD -MP
+PC_AUDIO_OUT := $(PC_GEN_DIR)/audio/pc_build
 
-pc: $(OBJ_DIR)/$(TITLE_EXE)
+pc: $(PC_BIN_DIR)/$(TITLE_EXE)
 
-DLLS:= $(OBJ_DIR)/SDL2.dll $(OBJ_DIR)/SDL2_mixer.dll \
-	$(OBJ_DIR)/libFLAC-8.dll $(OBJ_DIR)/libmpg123-0.dll \
-	$(OBJ_DIR)/libopusfile-0.dll $(OBJ_DIR)/libvorbisfile-3.dll \
-	$(OBJ_DIR)/libssp-0.dll $(OBJ_DIR)/libogg-0.dll $(OBJ_DIR)/libopus-0.dll \
-	$(OBJ_DIR)/libvorbis-0.dll
+DLLS:= SDL2.dll SDL2_mixer.dll libFLAC-8.dll libmpg123-0.dll \
+	libopusfile-0.dll libvorbisfile-3.dll libssp-0.dll libogg-0.dll \
+	libopus-0.dll libvorbis-0.dll
 
-$(OBJ_DIR)/$(TITLE_EXE): $(PC_OBJS) $(LIB_DIR)/$(CNESLIB_PC) $(DLLS)
+PC_BIN_DLLS := $(foreach s,$(DLLS),$(PC_BIN_DIR)/$(s))
+
+$(PC_BIN_DIR)/$(TITLE_EXE): $(PC_OBJS) $(LIB_DIR)/$(CNESLIB_PC) $(PC_BIN_DLLS)
 	$(DIR)
 	$(CC) $(PC_OBJS) -o $@ $(LDFLAGS) $(LIBS)
 
-$(OBJ_DIR)/%.pc.o: $(SRC_DIR)/%.c
+$(PC_OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(PC_AUDIO_OUT).h
 	$(DIR)
 	$(CC) $(DEPFLAGS) -o $@ -c $(CCFLAGS) $<
 
-# copy DLLs to the exe folder
-$(OBJ_DIR)/%.dll:
-	@cp -f /mingw64/$@ $@
+# PC famistudio audio targets
+pc_audio: $(PC_AUDIO_OUT).h
 
--include $(PC_OBJS:%.pc.o=%.pc.d)
+$(PC_AUDIO_OUT).h $(PC_AUDIO_OUT).c: $(AUDIO_SRC) $(wildcard ../scripts/*)
+	$(PY) ../scripts/generate_audio.py -p $(AUDIO_DIR) $(PC_GEN_DIR)/audio
+
+$(PC_OBJ_DIR)/pc_build.o: $(PC_AUDIO_OUT).c
+	$(DIR)
+	$(CC) $(DEPFLAGS) -o $@ -c $(CCFLAGS) $<
+
+
+# copy DLLs to the exe folder
+$(PC_BIN_DIR)/%.dll: /mingw64/bin/%.dll
+	$(DIR)
+	@cp -f $< $@
+
+-include $(PC_OBJS:%.o=%.d)

@@ -21,16 +21,12 @@ int audio_init() {
     return EXIT_FAILURE;
   }
 
-  // Count the number of songs we have
-  int i = 0;
-  while (song_list[i++] != NULL);
-  songs = malloc(sizeof(Mix_Music*) * i);
+  songs = malloc(sizeof(Mix_Music*) * songs_len);
 
   // Now initialize the songs with the provided songs
-  i = 0;
-  while (song_list[i] != NULL) {
-    songs[i] = Mix_LoadMUS(song_list[i]);
-    i++;
+  for (int i=0; i<songs_len; i++) {
+    SDL_RWops* ops = SDL_RWFromConstMem((void*)song_list[i], song_list_len[i]);
+    songs[i] = Mix_LoadMUS_RW(ops, 1);
   }
 
   return 0;

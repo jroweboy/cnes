@@ -7,6 +7,7 @@ import argparse
 import functools
 import os
 import pathlib
+import shutil
 import subprocess
 
 def fm(*args):
@@ -69,13 +70,59 @@ def export_engine(fin, fout):
     "-famistudio-asm-format:ca65",
     "-famistudio-generate-list")
 
+def bin2h(fin):
+  print(str(shutil.which("bin2header")))
+  done = subprocess.run([str(shutil.which("bin2header")), str(fin)], stderr=subprocess.STDOUT, stdout=subprocess.PIPE, text=True)
+  return done.stdout
+
 def export_ogg(fin, fout):
   fin = pathlib.Path(fin).resolve()
   fout = pathlib.Path(fout).resolve()
-  for file in fin.rglob('*.fms'):
-    fm(str(file),
-      "ogg-export",
-      f"{fout}/{file.stem}.ogg")
+  return fm(str(fin),
+    "ogg-export",
+    f"{fout}/{fin.stem}.ogg")
+
+def generate_pc(fin, fout):
+  fin = pathlib.Path(fin).resolve()
+  fout = pathlib.Path(fout).resolve()
+  
+  define = []
+  include = []
+  song_list = []
+  song_list_len = []
+  for i, file in enumerate(fin.rglob('*.fms')):
+    song = file.stem
+    export_ogg(file, fout)
+    bin2h(f"{fout}/{song}.ogg")
+    include += [f'#include "{song}.ogg.h"']
+    song_list += [f'{song}_ogg']
+    song_list_len += [f'sizeof({song}_ogg)']
+    define += ['#define ' + f'SONG_{song} {i}'.upper()]
+  
+  with open(f"{fout}/pc_build.c", 'w') as f:
+    f.write(f'''
+{os.linesep.join(include)}
+
+const unsigned int songs_len = {len(song_list)};
+
+const unsigned char* song_list[] = {{
+  {(',' + os.linesep).join(song_list)}
+}};
+
+const unsigned int song_list_len[] = {{
+  {(',' + os.linesep).join(song_list_len)}
+}};
+''')
+  with open(f"{fout}/pc_build.h", 'w') as f:
+    f.write(f'''
+#ifndef __CNES_PC_AUDIO_H
+#define __CNES_PC_AUDIO_H
+
+{os.linesep.join(define)}
+
+#endif //__CNES_PC_AUDIO_H
+''') 
+
 
 def generate_engine(fin, fout):
   '''Builds the asm module that should be linked with the build to provide audio
@@ -119,7 +166,8 @@ def generate_engine(fin, fout):
   # Load the generated include files to get the name of the exported songs
   song_data = []
   songs = []
-  for file in fout.rglob('*_songlist.inc'):
+  define = []
+  for i, file in enumerate(fout.rglob('*_songlist.inc')):
     with open(file) as f:
       songs += [file.stem[0:file.stem.find("_songlist")]]
       song_name = f.read().splitlines()[0]
@@ -133,6 +181,9 @@ def generate_engine(fin, fout):
         "sfxhi": f".hibyte({project_name}_sfx)",
         "sfxlo": f".lobyte({project_name}_sfx)",
       }]
+      # intentionally offset the song number by 1
+      # to make checking the queue is empty faster on NES
+      define += ['#define ' + f'SONG_{name} {i+1}'.upper()]
 
   song_data = functools.reduce(lambda a,b: {
         "banka": ", ".join([a['banka'],b['banka']]),
@@ -166,14 +217,29 @@ SFXAddrLo:   .byte {song_data['sfxlo']}"""
   template = template.replace("{famistudio_music_list}", song_data_template)
   template = template.replace("{famistudio_config_options}", os.linesep.join(config))
   template = template.replace("{famistudio_engine_code}", engine)
+
   with open(f"{fout}/engine_build.s", 'w') as file:
     file.write(template)
+
+  with open(f"{fout}/engine_build.h", 'w') as f:
+    f.write(f'''
+#ifndef __CNES_NES_AUDIO_H
+#define __CNES_NES_AUDIO_H
+
+{os.linesep.join(define)}
+
+#endif //__CNES_NES_AUDIO_H
+''') 
 
 def create_dir_if_missing(d):
   pathlib.Path(d).mkdir(parents=True, exist_ok=True)
 
 def main():
   parser = argparse.ArgumentParser(description='Processes Famistudio audio and outputs to NES and SDL formats')
+  
+  parser.add_argument('-a', '--all', action="store_true")
+  parser.add_argument('-n', '--nes', action="store_true")
+  parser.add_argument('-p', '--pc', action="store_true")
   parser.add_argument('fin', metavar='in', type=str,
                       help='Input Directory of fms files to build the song data from')
   parser.add_argument('fout', metavar='out', type=str,
@@ -181,8 +247,18 @@ def main():
                       
   args = parser.parse_args()
   create_dir_if_missing(args.fout)
-  export_ogg(args.fin, args.fout)
-  generate_engine(args.fin, args.fout)
+  
+  if (args.all):
+    generate_pc(args.fin, args.fout)
+    generate_engine(args.fin, args.fout)
+  elif (args.nes):
+    generate_engine(args.fin, args.fout)
+  elif (args.pc):
+    generate_pc(args.fin, args.fout)
+  else:
+    generate_pc(args.fin, args.fout)
+    generate_engine(args.fin, args.fout)
+
 
 if __name__ == '__main__':
   main()

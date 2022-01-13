@@ -38,7 +38,9 @@ extern volatile u8 sfx_queue;
 void __LIB_CALLSPEC sfx_play(u8 sfx);
 
 #else
-extern const char* song_list[];
+extern const unsigned char* song_list[];
+extern const unsigned int song_list_len[];
+extern const unsigned int songs_len;
 
 void __LIB_CALLSPEC music_start(u8 song);
 
