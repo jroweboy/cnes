@@ -9,22 +9,24 @@ NES_SRCS = nesheader
 INC_DIR = ../inc
 LIB_DIR = ../lib
 BIN_DIR = build
+GEN_DIR = $(BIN_DIR)/inc
+SRC_DIR = src
+AUDIO_DIR = ./assets/audio
+
 NES_OBJ_DIR = $(BIN_DIR)/nes/obj
 NES_BIN_DIR = $(BIN_DIR)/nes/bin
 NES_GEN_DIR = $(BIN_DIR)/nes/gen
 PC_BIN_DIR = $(BIN_DIR)/pc/bin
 PC_OBJ_DIR = $(BIN_DIR)/pc/obj
 PC_GEN_DIR = $(BIN_DIR)/pc/gen
-SRC_DIR = src
-AUDIO_DIR = ./assets/audio
 
 CNESLIB_NES = cnes.nes.lib
 CNESLIB_PC  = cnes.pc.lib
 
 # nes compiler defines
 # CCFLAGS contains a few C optimizing flags
-CFLAGS65 := -t nes -I $(INC_DIR) -I $(NES_GEN_DIR) --bin-include-dir $(INC_DIR) -g -W1
-CCFLAGS65 := -t nes -I $(INC_DIR) -I $(NES_GEN_DIR) --static-locals -Oirs -g
+CFLAGS65 := -t nes -I $(INC_DIR) -I $(GEN_DIR) --bin-include-dir $(INC_DIR) -g -W1
+CCFLAGS65 := -t nes -I $(INC_DIR) -I $(GEN_DIR) --static-locals -Oirs -g
 LIBS65 := $(CNESLIB_NES)
 LDFLAGS65 := -L $(LIB_DIR)
 
@@ -34,7 +36,7 @@ SDL_LIB_FLAGS:=$(shell pkg-config --libs-only-l ogg sdl2 sdl2_mixer)
 SDL_LIB_FLAGS_L:=$(shell pkg-config --libs-only-L ogg sdl2 sdl2_mixer)
 LIBS := -L$(LIB_DIR) $(SDL_LIB_FLAGS_L) -Wl,--start-group -lcnes.pc $(SDL_LIB_FLAGS) -Wl,--end-group
 LDFLAGS := -Wl,-subsystem,windows
-CCFLAGS := $(shell pkg-config --cflags ogg sdl2 sdl2_mixer) -Wall -g -O0 -I$(INC_DIR) -I$(PC_GEN_DIR)
+CCFLAGS := $(shell pkg-config --cflags ogg sdl2 sdl2_mixer) -Wall -g -O0 -I$(INC_DIR) -I$(GEN_DIR)
 
 # release
 #LIBS := $(shell pkg-config --libs sdl2)
@@ -108,7 +110,7 @@ audio: nes_audio pc_audio
 nes_audio: $(NES_AUDIO_OUT).o
 
 $(NES_AUDIO_OUT).s $(NES_AUDIO_OUT).h: $(AUDIO_SRC) $(wildcard ../scripts/*)
-	$(PY) ../scripts/generate_audio.py -n $(AUDIO_DIR) $(NES_GEN_DIR)/audio/
+	$(PY) ../scripts/generate_audio.py -n $(AUDIO_DIR) $(BIN_DIR)
 
 $(NES_AUDIO_OUT).o: $(NES_AUDIO_OUT).s
 	$(DIR)
@@ -141,7 +143,7 @@ $(PC_OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(PC_AUDIO_OUT).h
 pc_audio: $(PC_AUDIO_OUT).h
 
 $(PC_AUDIO_OUT).h $(PC_AUDIO_OUT).c: $(AUDIO_SRC) $(wildcard ../scripts/*)
-	$(PY) ../scripts/generate_audio.py -p $(AUDIO_DIR) $(PC_GEN_DIR)/audio
+	$(PY) ../scripts/generate_audio.py -p $(AUDIO_DIR) $(BIN_DIR)
 
 $(PC_OBJ_DIR)/pc_build.o: $(PC_AUDIO_OUT).c
 	$(DIR)

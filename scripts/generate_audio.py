@@ -71,7 +71,6 @@ def export_engine(fin, fout):
     "-famistudio-generate-list")
 
 def bin2h(fin):
-  print(str(shutil.which("bin2header")))
   done = subprocess.run([str(shutil.which("bin2header")), str(fin)], stderr=subprocess.STDOUT, stdout=subprocess.PIPE, text=True)
   return done.stdout
 
@@ -84,7 +83,7 @@ def export_ogg(fin, fout):
 
 def generate_pc(fin, fout):
   fin = pathlib.Path(fin).resolve()
-  fout = pathlib.Path(fout).resolve()
+  fout = pathlib.Path(f"{fout}/pc/gen/audio/").resolve()
   
   define = []
   include = []
@@ -93,8 +92,8 @@ def generate_pc(fin, fout):
   for i, file in enumerate(fin.rglob('*.fms')):
     song = file.stem
     export_ogg(file, fout)
-    bin2h(f"{fout}/{song}.ogg")
-    include += [f'#include "{song}.ogg.h"']
+    print(bin2h(f"{fout}/{song}.ogg"))
+    include += [f'#include "./{song}.ogg.h"']
     song_list += [f'{song}_ogg']
     song_list_len += [f'sizeof({song}_ogg)']
     define += ['#define ' + f'SONG_{song} {i}'.upper()]
@@ -129,7 +128,7 @@ def generate_engine(fin, fout):
   This builds from all the FMS provided in the input directory.'''
 
   fin = pathlib.Path(fin).resolve()
-  fout = pathlib.Path(fout).resolve()
+  fout = pathlib.Path(f"{fout}/nes/gen/audio/").resolve()
   file_path = os.path.abspath(os.path.dirname(__file__))
   config = set()
   segments = set()
@@ -243,10 +242,13 @@ def main():
   parser.add_argument('fin', metavar='in', type=str,
                       help='Input Directory of fms files to build the song data from')
   parser.add_argument('fout', metavar='out', type=str,
-                      help='Build Directory to write the output files to')
+                      help='Build Directory to write the output files to.')
                       
   args = parser.parse_args()
   create_dir_if_missing(args.fout)
+  create_dir_if_missing(f"{args.fout}/nes/gen/audio")
+  create_dir_if_missing(f"{args.fout}/pc/gen/audio")
+  create_dir_if_missing(f"{args.fout}/inc")
   
   if (args.all):
     generate_pc(args.fin, args.fout)
@@ -258,6 +260,22 @@ def main():
   else:
     generate_pc(args.fin, args.fout)
     generate_engine(args.fin, args.fout)
+
+  with open(f"{args.fout}/inc/music.h", 'w') as f:
+    f.write('''
+/**
+ * Generated include file by the CNES build process. Include these
+ * macros to use with the 
+ */
+#ifndef CNES_GENERATED_MUSIC_H
+#define CNES_GENERATED_MUSIC_H
+#ifdef __NES__
+#include "../nes/gen/audio/engine_build.h"
+#else
+#include "../pc/gen/audio/pc_build.h"
+#endif //__NES__
+#endif //CNES_GENERATED_MUSIC_h
+''')
 
 
 if __name__ == '__main__':
