@@ -28,6 +28,12 @@ CNES is still in heavy development so expect it to change often!
 Check out the `example` directory for the full example.
 
 ```c
+
+/**
+ * Main game loop called by the CNES engine
+ * 
+ * See: example/main.c for the full code
+ */
 void runframe() {
     update_joypad();
 
