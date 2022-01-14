@@ -1,0 +1,500 @@
+0.9.1
+File support:
+	* Import now support 1bpp BMP:s; in addition to previous 4bpp and 8bpp BMP:s. 
+
+Bugfixes:
+	* performance issues, including some severe ones, were squashed when: 
+		-dragging sprites around on the metasprite canvas
+		-editing metasprites in general while the metasprite manager is open.
+	* nudge/rotate/mirror would 'remember' a selection on the CHR table if auto-deselected by selecting something on the screen canvas instead.
+		With the selection still being on the screen canvas, it was possible to access performing these actions across the old selection. 
+		This has bin fixed (even if remembering has a certain feature potential if UX:d better). 
+	* Swapping tiles correctly sets UNDO points now. 
+	* The meaning of Low and High bitplanes got mixed up when nudging tiles horizontally. This has been fixed now.
+	* fixed some conflicting Alt shortcuts
+	* Preferences: aligning sprite list left or center is now applied when saving/loading the preferences.
+
+Naming conventions:
+	*Several menu items and other elements have had their captions changed to improve clarity of what they're doing or representing. 
+	The most noticable change is one of the menu groups as well as the first tab. The "nametable" menu group was changed to "canvas" to reflect
+	that the canvas may display and edit a screen (nametable + attribute table), or a map (not a nametable, technically speaking). 
+	The first tab, as well as the titlebar caption, changes depending on if you're editing a screen or a map. 
+	This part of ongoing work to make NEXXT work with new educational material being developed. 
+ 
+
+0.9.0
+==============================================
+-Preferences [Ctrl+P]
+	This new dialogue is for applying and saving config files. When opening the dialogue, it comes preloaded with certain changes you might have done
+	through the "options" menu items, such as if you've selected to save nametables with RLE compression, for example. 
+	A quick way to canonize new preferences is therefore to press ctrl+p and then directly enter. 
+	Browsing through the tabs gives you a better overlook though, as well as an idea of what options are preference-able. 
+
+	In case you want to reset preferences, you can either press the "Reload install settings" button and then press enter.  
+	Another way to do it is to simply delete the preferences.cfg file. If no preference file is present, NEXXT will generate
+	a fresh one next time NEXXT is started. 
+
+	The most useful feature of the preference dialogue is probably the Startup settings tab. This contains some settings you would otherwise not find
+	in the menu system, but that may speed up your workflow or otherwise at least make the user experience a bit more tailormade. 
+
+0.8.1
+==============================================
+Quick update to fix some things. 
+
+CHR editor: vertical and horizontal flip hotkeys are functional again.
+
+Fill [F] is now itemized as a menu action.
+	It happened on several occasions that users have wondered how to perform the fill action now that Ctrl+F means "Find tiles from selection".
+	The answer that you simply press F had to be looked up in the hotkey readme. The action can now be found under the Edit menu; grouped with
+	select all, deselect, and delete, along with its hotkey description.
+
+	As a side effect, F is now a global hotkey. That means you can access it even if the CHR editor or Metasprite Manager is the active window.
+	However, Fill is disabled if the Metasprites tab is active in the main window as a precaution. 
+	In Type In mode, the hotkey itself is temporarily disabled, but you can still access the action through the menu. 
+
+A new preferences dialogue is in the works, 
+	but it plus any file writing/reading related to it has been disabled in this version until everything works as it is supposed to.
+
+0.8
+==============================================
+First, 2 general notes. 
+1) The growth rate has been explosive lately. To not bother the community with too frequent updates, i've rolled releases minor releases into
+   one large update.
+2) The new "preferences" menu doesn't yet store its settings between sessions. That's for another update. Apologies for the inconvenience. 
+
+
+Work safety
+----------------------------------------------
+More secure close procedure:
+	-if there is unsaved work, clicking on the close button on the main window (or if the OnClose event is otherwise called)
+	 now produces the same confirmation dialog as the ctrl+q action.
+
+	-ctrl+q now calls OnClose() instead of conditionally calling exit(0).
+
+
+Metasprites:
+----------------------------------------------
+Better sprites per scanline warning system:
+	- if 5 or more sprites are present on a scanline, 
+	  a 1px wide yellow warning dot will appear on each valid scanline; on each side of the canvas.
+	  (5 means 2 objects of the same type/width can't populate the same vertical estate without cancellation or flicker.)
+	- if 9 or more sprites are present on a scanline, 
+	  a 2px wide bright red warning dot will appear (overwriting the yellow warning); on each side of the canvas. 
+ 	  (9 means the object can't get drawn without cancellation or flicker.)
+
+More "make metasprite" (Ctrl+M) options:
+	When using Ctrl-M to make a metasprite from a nametable/map selection, the original behaviour was to 
+	center-align the result on both axes. 
+	-Now, there are options to align the sprite left, right, bottom and top relative to the "make" origin.
+	-The "make" origin can now be set either to center of canvas (default) or the anchor cross.
+
+Full editability of the sprite attributes byte:
+	-Priority bit and unimplemented bits 4,3 and 2 of a sprite object are now editable. 
+	-Previously, the text export would forget any of these 4 bits if they were set in a sprite object. That has been fixed. 
+
+	Please note: NEXXT currently has no way of displaying the masking effect/quirk. 
+	(occurs an NES when a sprite of higher sprite drawing priority has the bg priority bit set and eclipses a sprite of 
+	lower drawing priority with the bg priority bit clear.) 
+
+New hotkey: P for Priority
+	While one or more sprites are selected in the list, P will toggle the priority bit for those objects. 
+
+Export metasprites/bank as BMP file(s):
+	-F11 will export the active metasprite as BMP.
+	-Ctrl-F11 will export all existing metasprites as a BMP sequence.
+	You can optionally find both actions under File>Export
+
+Export metasprites/bank as BMP clipboard objects:
+	Under the Metasprites menu, you'll find both corresponding actions. 
+	
+	A note on putting multiple metasprites on the clipboard stack:
+	-Because windows requires a period of 200ms to pass between clipboard entries in order to not overwrite the last one, 
+	this process may take a while. If you're putting more than 10 metasprites on the clipboard simultaneously, 
+	NEXXT will ask you to confirm the choice. 
+
+	To retrieve your sequence of clipboard objects, press Win-V.
+
+Options for exporting metasprite(s) as text:
+	-NEXXT now has a range of different options for adding metadata to each metasprite.
+	 
+	 There are 6 different ways lay down bytes to tell your engine when a metasprite ends:
+		A) None (implied size by your engine, or separate table)
+		B) -Count header (tell the engine how many sprites to work before data)
+		C) N flag ($80) (tell the engine N flag has been set. Standard NESST/NESlib behaviour). 
+		D) -$FF	
+		E) -$00
+		F) -Double $00
+
+
+Metasprite & Metasprite bank names:
+	Previously, the software would always ask for a name if exporting a bank, and never if exporting a single metasprite.
+	The names were defaulted to "metasprite". 
+
+	Now, either action has its own option to ask for a name, with the filename being the default value. 
+	The option is checked for banks and not for metasprites, per default. 	
+
+
+Patterns/tilesets:
+----------------------------------------------
+New stat - Entries in selection:
+	When hovering the mouse over the tileset, you can now also tell how many entries of the tiles there are on the nametable/map within a selection. 
+	The selection may be a single tile, several single tiles [ctrl+click], or a selection rectangle of tiles. 
+
+
+Nametable:
+----------------------------------------------
+Improved [Nametable > Copy as text >] actions:
+	-Previously, these actions would just ignore if no selection on the nametable/map was made. 
+	Now, no selection defaults to all of the nametable/map. Stat messages have been added to let the user know the difference when carrying out the action.
+	Tip: If the nametable canvas was last clicked on, Ctrl+A will select all of the viewport; but no more (a map may be larger than the viewport). 
+	This can be useful for exporting screen wide chunks as text. 
+
+
+Colour & palettes:
+----------------------------------------------
+Master palette choice now visible to user:
+	On startup, NESST & the current version of NEXXT looks for an external palette file. If one can't be found, 
+	it uses an internal table instead. 
+	-The state of this process is now visible through the menu item Palettes > Master Palette.
+	-The user can reevaluate the master palette by either choosing 
+		A) Palettes > Master palette > External 192 byte palette (nes.pal)
+		B) Palettes > Master palette > NESST classic
+
+	On choosing (A), if no external file is found, it will default to (B) as a safety backup. 
+	
+	This feature set was done for potential future things to come. For now, it mostly improves 
+	visibility and removes the need to restart NEXXT to reevaluate the master palette.
+
+
+General & UI:
+----------------------------------------------
+
+CHR Editor screen placement:
+	Previously, the CHR editor would open in the middle of the work area, 
+	which was generally in the way and required a drag interaction by the user before getting to work. 
+	Since this is often one of the first things you do each session, i wanted to do something about that.
+	
+	-Now, the first time you open the CHR Editor in a session, it will (attempt to) place itself by the right 
+	hand side of the tileset canvas of the main window.
+	
+Preferences menu:
+	This new main menu item contains the following features:
+	
+	A) Asm syntax style (New. When exporting or copying to text, you can set NEXXT to export directives in the .byte/.word 
+	or the .db/.dw style. This should reduce the need for editing the text post-fact for some users. 
+	
+	B) Editor bitmask options (moved from the edit menu)
+	
+	C) Type In ASCII Base offset (moved from the edit menu)
+	
+	D) Workspace arrangement (new)
+	
+	E) Advanced (moved from the palette menu)	
+
+	These, and some other options, are slated to be stored in an external configuration file in a future version. 
+
+
+Other menu items moved:
+	-The menu folders "emphasis bits" and "palette set" have been moved from "view" to "palettes" to better correspond to the 
+	form's categorization of said items.
+
+
+Metasprite editor rearranged:
+	The canvas/editor is now center of the workspace, which improves workspeed and makes it easier for beginners to learn 
+	how to drag and drop sprites on the canvas. If the old style is preferred, go to: 
+	Preferences > metasprite editor arrangement > List right of canvas.
+
+
+Groupbox alignment and x3 / x4 scales:
+	While it still looks sort of wonky, the layout and view groupboxes now align to the left of their parent groupbox 
+	when the workspace is scaled, making them a bit more convenient to access while working in these scale modes. 
+
+Changed keybindings:
+	Export > Tileset as BMP is now Ctrl+F12
+	Export > Palette as BMP is now Ctrl+Shift+F12
+
+Changed menu item didactics:
+	A few menu items had their names changed to improve clarity. 
+	Most notably, Preferences > Advanced > Enforce NES safe palette entries was changed to the more accurate description:
+	"Enforce using $0F as black"
+
+
+Minor bug fixes & misc:
+----------------------------------------------
+	-Type In ASCII Base offset erroneously checked the -$30 option when the default behaviour actually 
+	is -$20, just like it does behind the curtains in NESST.
+
+	-you can no longer drag the anchor beyond the bottom or right edge of the metasprite canvas.
+
+	-Made reselecting while dragging (keep holding left button & right click) stable on the nametable canvas (previous version 
+	 could sometimes/often forget a selection rectangle should be drawn in case the mouse moved a single point).  
+
+	-Replaced some more direct calls to some update routines with a timed update cue for better performance. 
+
+	-It was formerly possible to make a metasprite with an ypos value of 255. This is unfortunately the value the tool uses to interpret the item as non-			existing and elegible for overwrites and skips. To safeguard against this, the stopgap solution is that the tool reassigns it to have a value of 254. 
+	In the extreme off chance that a user actually wants the y position to be 255, they have to edit that post-export. 
+	This also applies to moving a sprite into the ypos value 255, in which case the action isn't taken.
+	A stat message is shown if a move failed.   
+
+	-Change of grammar in 5 message boxes.
+
+
+Newly discovered bugs:
+----------------------------------------------
+	-All "put on cliboard as BMP" actions work as intended when copied and pasted on the same system. 
+	However, using logitech flow to copy from one test system (win7) to another (win10) offset the data
+	by 3 pixels. The bug likely resides within the arguments i pass to the VCL function, or within the VCL
+	function itself. I haven't found a convenient solution as of yet. It's unlikely users will encounter this problem.
+		 
+
+0.7.2
+==============================================
+In general:
+-----------
+Remove unused [Ctrl+Shift+U] & Remove duplicates [Ctrl+Shift+U] improvement:
+	-It's now an option if you want the remaining tiles autosorted or not. 
+	 For now, the default mode is *not* sorting on removal since that was suggested to be better. It's on trial. 
+
+Nametable editor:
+-----------------
+Fill [F] improvement:
+	-Is now aware of the currently active subpalette and will fill attributes if the "apply attributes" 
+	 button is down
+
+Type In bugfixes:
+	-hotkeys on the top row of numbers as well as the shortcut shift+s are now disabled while in 
+	 "type in" mode as well. 
+
+Metasprite editor:
+------------------
+Metasprite editor general improvements:
+	-Ctrl c/v/x will operate on the metasprite field or the tileset depending on what was clicked on last. 
+	 (Sprite list acting the same is on the todo list)
+
+Sprite list priority up/down improvements:
+	-Will now work on not just 1 sprite at a time, but also a selection of sprites. 
+
+Improved sprite list controls:
+	-When the sprite list is the active object (in general terms last clicked on), usually arrow key inputs 
+	operate on the position of currently selected sprite(s). 
+	
+	However, with this version,
+	-If holding [ctrl], key input from [up], [down], [home] and [end] will navigate the sprite list. 
+	-[ctrl+shift] plus [up/down/home/end] will select multiple items. 
+
+Improved Selected sprites display:
+	-When you select more than 1 sprites on the sprite list, all selected tiles will 
+	display a white selection box. They'll also show when the "box" filter option is set to sel (selected only).
+	This is both more informative and makes the selection display filters more useful.
+
+Improved didactics:
+	-Cleaned up and elaborated on the Metasprite editor tips; which should be helpful getting started. 
+ 
+
+
+Minor bugfixes:
+-----------------
+	-Deselect now correctly sets the tile cursor to the first tile (off by one error). 
+	-Hide "Selected: n" if no individual tiles are selected in series. 
+	-forgot to cast an int as AnsiString for the stat readout when copypasting metasprites. Now fixed. 
+	-found & removed two cases where undo would be set despite no action is taking place 
+	attempting to move a sprite up or down the list but the home or end of the list has already been reached).
+ 	-the Anchor for the Metasprites can now be 0,0 (previously the minimum was 8,8)
+
+
+Newly known bugs:
+-----------------
+	-While snap is turned on, moving multiple sprites at once with the arrows doesn't yield the desired result.
+ 
+0.7.1
+==============================================
+General improvements:	
+	-Fixed some cosmetic blemishes in certain situations with the status bar. 
+
+Bug fixes:
+	-The memory leak was reintroudiced in 0.7.0, although less severe this time. Now fixed, hopefully for good. 
+
+Documentation:
+	-Took the opportunity to include more hotkeys and mouse actions i forgot about in the last distribution.
+	Should make it easier for newcomers to get started, until proper documentation is in place. 
+
+General new findings:
+	-The first time you start a new version of NEXXT on a 64 bit system, windows 10 will pad it
+	with redundant RAM allocation (about 103-104mb) for some reason. 
+	If this is a problem, simply close and restart NEXXT. 
+	Subsequent times, it should allocate about 21mb. 
+
+
+0.7.0
+==============================================
+New Nudge features: 
+	Nudge now works on any rectangular selection of tiles. The patterns will wrap at the edge of the selection,
+	instead of around each tile. "Nudge into" has become redundant and has been removed from the interface.
+
+
+More CHR editor actions have become selection rectangle aware:
+	The following actions can now act on a rectangular selection of chr tiles:
+	- Increase/Decrease Value (with cap or wrap-around)
+	- Mirror H/V*
+	- Rotate L/R*
+
+	These actions operate on the contents of each tile; not the each tiles' position in the table. 
+	If you wish to rearrange their ID:s, you still have to do that part manually. 
+
+	This is a safety measure as to not make references in nametables/maps not in the current project lose their references.
+	An option might become available at some later point, pending a potential feature to link and work on multiple maps, down the road.    
+
+
+Quicksave:
+	A simple session save [Ctrl+S] without a file dialog is finally in. And largely untested, but should work. Let me know if there are any problems. 
+
+
+Lock Stats readout:
+	Press [CAPS LOCK] to lock the stats readout at the bottom of the nametable view. Press again to unlock. 
+	
+	This can be useful for examining values or taking notes or working with another tool such as a text editor;
+	without the cursor disturbing the values.  
+
+	Once unlocked again, the stats will refresh if stat changes (such as the cursor position) were made. 
+
+	"Lock stats" mode is not available while in "Type In" mode [CTRL+T]. 
+ 
+
+Selection tool - big performance improvement:
+	The selection tool is now instantaneously responsive, even on aged netbooks. 
+	An old issue with nesst were the sluggish drag-to-select actions on the NT, and tileset especially. 
+	The old fix i did reduced # of updates to a grid collision system instead of cursor points basis, 
+	which made it better but not perfect. A timer throttle improved that slightly. 
+	The new fix, which on its own is enough to make selection rectangles respond snappy to the cursor movement, 
+	was done by suppressing superfluous updates to the nametable while a selection was being drawn.  
+
+
+Improved "Find Doubles" [Ctrl+D]
+	This action now finds any and all doubles in tiles with content. Originally the behaviour only looked for doubles on a single active tile, which was a bit needle in a haystack.
+
+
+Better control over "Find Unused" [Ctrl+U] and "Delete Unused" [Ctrl+Shift+U]
+	You can now set options to look at tile usage on the active tab (Nametable or Metasprites), just the nametable/map, just the sprites, or both. 
+	If you uncheck "force: only on active tab", the checks on the two other options take priority. 
+
+	Originally finding unused would only look at nametable, but deleting would skip both nt and metasprite-used tiles. The problem was part you couldn't decide, and also that it's more rare than common to share the same table for both background and sprites. 
+
+
+New hotkeys:
+	-T: Turns on Type In mode. In order turn off Type In mode with [T] as well, the nametable needs to be deselected [CTRL+SHIFT+A]. 
+	Alternately, press [CTRL+T].
+
+	-D: Grid on/off. Double for Hotkey [H]. The ideal resting hand position for layout work is over the WASD keys, and the grid is something that is useful to turn on/off frequently. The old hotkey [H] is preserved because of the HJKL strip that toggles all the four options for the grid as laid out on the form.
+
+
+Hotkey mnemonics:
+	-While ergonomy and speed of use were always the main goal for direct hotkeys, some mnemonics worked their way in. 
+	In the order the buttons appear top to bottom, their corresponding hotkeys spell out words.
+
+	Layout buttons - WET
+	W - Apply Patterns
+	E - Apply Attributs
+	T - Type In Mode
+
+	View buttons - SAD
+	S - Selected only
+	A - Attribute checker
+	D - Grids on/off 
+
+
+Gloves off: 
+	NEXXT no longer asks for confirmation when:
+	-clearing A+B tilesets (ctrl+del, or patterns>generare>clear)
+	-clearing one or several sprite(s) in a metasprite (selection + delete button or del while on the metasprite tab)
+	-clearing a metasprite 
+
+	...in order to remove workflow bumps. 
+
+
+Action announcement:
+	For now, the following actions are announced on the status bar:
+	-clearing A+B tilesets
+	-clearing one or several sprite(s) in a metasprite
+	-clearing metasprite
+	-deleting doubles
+	-deleting unused*
+
+	-copy selection as BMP (can be nametable or character data depending on context)
+
+	Action announcements will hold for a second if another status update is pending (moving, clicking or holding the cursor over a canvas)
+
+	The working design principle for now is that if something is:
+	-deleted without confirmation dialog
+	-destructively altered without confirmation dialog
+	-unclear what has been operated on
+	-a tip tied directly to the situation following the action could be helpful, 
+
+	then an action confirmation should show, unless it is too bulky for the workflow. 
+
+	I've probably missed several cases. Will add more as i realize them. 
+
+
+Minor bug fixes:
+	-The nametable hotkey "H" (toggle grid on/off) was mislinked to 1x1 grid set/clear. Now corrected. 
+	-The menu action and corresponding shortcut for type in mode [Ctrl+T] now works.
+	-Removed a situation where the cpu would overwork if shift was held in some conditions; also freezing stat updates after a second or two.
+	-Shortcuts that simply use shift as modifier are disabled while Type In Mode is active. 
+	-A failed session load would still clear the "unsaved changes" asterisk. Should work as expected now. 
+
+
+Known bugs:
+	-While dragging a rectangular selection on the chr table, # of tiles selected only shows up in the stats text on rare occasions.
+	-If selecting multiple individual patterns with ctrl-click, the deselect action [Ctrl+Shift+A] will misjudge a bit and select the 2nd tile 
+	(a tile must always selected on the chr table even if you deselect. The current norm is tile #$00.)
+
+Big todos:
+	-Improve control over what action affects what thing under the metasprite tab. 
+
+0.6.5:
+==============================================
+
+New general hotkeys: 
+--------------
+
+- .< (on US keyboards): Previous metasprite
+- ,> (on US keyboards): Next metasprite
+
+This reflects conventions of other tools (such as Aseprite, unless that was something i configured).
+
+-num 1,2,3,4,6,7,8,9: navigate between tiles
+-num 5: open/close chr editor
+
+  
+New hotkeys while in CHR Editor is active:
+--------------
+
+-N "Nudge into" toggle. this is a beta function that will eventually get self implied if more than one tile are selected)
+-I "hI bit" bitmask toggle. To set what the bitmask affects, go to edit>bitmask options
+-O "lO bit" bitmask toggle. To set what the bitmask affects, go to edit>bitmask options
+
+Misc:
+--------------
+
+-re-enabled some hotkeys that had been temporarily disabled in the CHR Editors. They include:
+
+-Arrow keys for nudging
+-If nametable is the active tab: ctrl + num 4 & num 6 for stepping between a series of nametable "frames" as specified in vanilla NESST readme. Warning: you should save a chr before stepping through.
+
+-changed import warning message to reflect a previous change: Tiles in the excess of 256 will now be placed on the 2nd pattern table instead of being ignored.
+A normal NES nametable doesn't support displaying more than 256 tiles at once, though, and currently NEXXT doesn't support mappers
+with extended nametable attributes (such as VRC5, MMC5, MXM-0).
+
+-replaced checkboxes with speed buttons in the CHR editor because of a problem where Winforms take control over part of the keyboard if checkboxes are present in an active window. 
+
+
+0.6.4b:
+==============================================
+-a memory leak was miraculously removed by restarting the IDE PC and rebuilding this tool.
+-tamed some troublesome CPU hotspots that may have caused older laptops to start their fans if moving the mouse over the canvases too much.
+
+0.6.3b:
+==============================================
+-fixed so that the ASCII offset default is -32, just like in the original NESST. this will remain until charmap support is added. 
+-fixed a Type In bug where ASCII offsets were double negated. 
+-fixed omission of updating the status bar when a session saves as a new name. 
+-fixed a few typos, whereof one used to mess up an alt shortcut. 

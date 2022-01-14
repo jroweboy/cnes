@@ -14,4 +14,3 @@ void runframe() {
         music_start(SONG_METAL_CRUSHER);
     }
 }
-
