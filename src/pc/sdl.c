@@ -1,10 +1,16 @@
 
+
 #include "cnes.h"
 #include "internal.h"
 #include <SDL2/SDL.h>
 
-int main(int argc, char *argv[]) {
 
+int main(int argc, char *argv[]) {
+  SDL_LogInfo(LOG_DRIVER, "hello");
+  if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_EVENTS) != 0) {
+    SDL_LogError(LOG_DRIVER, "Unable to initialize SDL: %s", SDL_GetError());
+    return 1;
+  }
   renderer_init();
   audio_init();
   joypad_init();

@@ -1,6 +1,7 @@
 bin/
-example/bin/
 lib/
+build/
+example/bin/
 example/build/
 tools/famistudio/Autosaves
 tools/famistudio/Demo\ Songs

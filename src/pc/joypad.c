@@ -1,5 +1,6 @@
 
 #include "cnes.h"
+#include "internal.h"
 #include <SDL2/SDL.h>
 
 struct Joypad {
@@ -20,7 +21,7 @@ int joypad_init() {
   int ret = SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
   if (ret < 0)
   {
-    printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
+    SDL_LogError(LOG_JOYPAD, "SDL could not initialize! SDL Error: %s\n", SDL_GetError());
     return ret; 
   }
 
@@ -30,7 +31,7 @@ int joypad_init() {
       if (controller) {
         break;
       } else {
-        fprintf(stderr, "Could not open gamecontroller %i: %s\n", i, SDL_GetError());
+        SDL_LogError(LOG_JOYPAD, "Could not open gamecontroller %i: %s\n", i, SDL_GetError());
       }
     }
   }

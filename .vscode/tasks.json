@@ -1,0 +1,20 @@
+{
+  "tasks": [
+    {
+      "type": "cppbuild",
+      "label": "C/C++: g++.exe cmake build",
+      "command": "C:/msys64/mingw64/bin/ninja.exe",
+      "args": [],
+      "options": {
+        "cwd": "${workspaceFolder}/build/pc"
+      },
+      "problemMatcher": ["$gcc"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "compiler: C:/msys64/mingw64/bin/g++.exe"
+    }
+  ],
+  "version": "2.0.0"
+}

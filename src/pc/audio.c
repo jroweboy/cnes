@@ -1,5 +1,6 @@
 
 #include "cnes.h"
+#include "internal.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
@@ -9,19 +10,22 @@ int audio_init() {
   int flags=MIX_INIT_OGG;
   int initted=Mix_Init(flags);
   if ((initted & flags) != flags) {
-    printf("Mix_Init: Failed to init required ogg support!\n");
-    printf("Mix_Init: %s\n", Mix_GetError());
+    SDL_LogError(LOG_AUDIO, "Mix_Init: Failed to init required ogg support! %s\n", Mix_GetError());
     return EXIT_FAILURE;
   }
 
 
   if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
-    printf("SDL2_mixer could not be initialized!\n"
+    SDL_LogError(LOG_AUDIO, "SDL2_mixer could not be initialized!\n"
             "SDL_Error: %s\n", SDL_GetError());
     return EXIT_FAILURE;
   }
 
-  songs = malloc(sizeof(Mix_Music*) * songs_len);
+  songs = malloc(songs_len * sizeof(Mix_Music*));
+  if (!songs) {
+    SDL_LogError(LOG_AUDIO, "Umm malloc?\n");
+    return EXIT_FAILURE;
+  }
 
   // Now initialize the songs with the provided songs
   for (int i=0; i<songs_len; i++) {
@@ -34,8 +38,7 @@ int audio_init() {
 
 void __LIB_CALLSPEC music_start(u8 song) {
   if(Mix_PlayMusic(songs[song], -1) == -1) {
-    printf(".OGG sound could not be played!\n"
-            "SDL_Error: %s\n", SDL_GetError());
+    SDL_LogError(LOG_AUDIO, ".OGG sound could not be played!\n SDL_Error: %s\n", SDL_GetError());
   }
 }
 

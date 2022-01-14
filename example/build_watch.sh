@@ -1,6 +1,6 @@
 #!/bin/env sh
 
-../tools/inotifywait.exe -m -r ./src/ ../inc/ ./Makefile ../Makefile ../scripts ../src/ | 
+../tools/inotifywait.exe -m -r ./src/ ../inc/ ./CMakeLists.txt ../CMakeLists.txt ../scripts ../src/ | 
     while read -r date time dir file;
         do
         flag=$((1-flag))
@@ -10,7 +10,7 @@
         then
             # clear;
             echo '================= Building ================='
-            if make; then
+            if (cd build/pc; ninja); then
                 echo "build success"
             else
                 echo "build failed"

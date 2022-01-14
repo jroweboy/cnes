@@ -83,7 +83,7 @@ def export_ogg(fin, fout):
 
 def generate_pc(fin, fout):
   fin = pathlib.Path(fin).resolve()
-  fout = pathlib.Path(f"{fout}/pc/gen/audio/").resolve()
+  fout = pathlib.Path(f"{fout}/pc/audio/").resolve()
   
   define = []
   include = []
@@ -98,7 +98,7 @@ def generate_pc(fin, fout):
     song_list_len += [f'sizeof({song}_ogg)']
     define += ['#define ' + f'SONG_{song} {i}'.upper()]
   
-  with open(f"{fout}/pc_build.c", 'w') as f:
+  with open(f"{fout}/internal.c", 'w') as f:
     f.write(f'''
 {os.linesep.join(include)}
 
@@ -112,7 +112,7 @@ const unsigned int song_list_len[] = {{
   {(',' + os.linesep).join(song_list_len)}
 }};
 ''')
-  with open(f"{fout}/pc_build.h", 'w') as f:
+  with open(f"{fout}/internal.h", 'w') as f:
     f.write(f'''
 #ifndef __CNES_PC_AUDIO_H
 #define __CNES_PC_AUDIO_H
@@ -128,7 +128,7 @@ def generate_engine(fin, fout):
   This builds from all the FMS provided in the input directory.'''
 
   fin = pathlib.Path(fin).resolve()
-  fout = pathlib.Path(f"{fout}/nes/gen/audio/").resolve()
+  fout = pathlib.Path(f"{fout}/nes/audio/").resolve()
   file_path = os.path.abspath(os.path.dirname(__file__))
   config = set()
   segments = set()
@@ -220,7 +220,7 @@ SFXAddrLo:   .byte {song_data['sfxlo']}"""
   with open(f"{fout}/engine_build.s", 'w') as file:
     file.write(template)
 
-  with open(f"{fout}/engine_build.h", 'w') as f:
+  with open(f"{fout}/internal.h", 'w') as f:
     f.write(f'''
 #ifndef __CNES_NES_AUDIO_H
 #define __CNES_NES_AUDIO_H
@@ -246,8 +246,8 @@ def main():
                       
   args = parser.parse_args()
   create_dir_if_missing(args.fout)
-  create_dir_if_missing(f"{args.fout}/nes/gen/audio")
-  create_dir_if_missing(f"{args.fout}/pc/gen/audio")
+  create_dir_if_missing(f"{args.fout}/nes/audio")
+  create_dir_if_missing(f"{args.fout}/pc/audio")
   create_dir_if_missing(f"{args.fout}/inc")
   
   if (args.all):
@@ -270,9 +270,9 @@ def main():
 #ifndef CNES_GENERATED_MUSIC_H
 #define CNES_GENERATED_MUSIC_H
 #ifdef __NES__
-#include "../nes/gen/audio/engine_build.h"
+#include "../nes/audio/internal.h"
 #else
-#include "../pc/gen/audio/pc_build.h"
+#include "../pc/audio/internal.h"
 #endif //__NES__
 #endif //CNES_GENERATED_MUSIC_h
 ''')

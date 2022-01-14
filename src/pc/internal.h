@@ -4,6 +4,14 @@
 
 #include <SDL2/SDL.h>
 
+// Logging defines
+
+#define LOG_DRIVER 0
+#define LOG_AUDIO 1
+#define LOG_RENDER 2
+#define LOG_JOYPAD 3
+
+
 // Init functions
 
 int renderer_init();
