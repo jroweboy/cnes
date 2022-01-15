@@ -9,13 +9,17 @@ import os
 import pathlib
 import shutil
 import subprocess
+import sys
 
 def fm(*args, famistudio_path=None):
   # Default location for now is ../tools/famistudio/Famistudio
   if not famistudio_path:
     file_path = os.path.abspath(os.path.dirname(__file__))
     famistudio_path = f"{file_path}/../tools/famistudio/Famistudio"
-  done = subprocess.run([famistudio_path, *args], stderr=subprocess.STDOUT, stdout=subprocess.PIPE, text=True)
+  cmd = [famistudio_path, *args]
+  if sys.platform != "win32":
+    cmd = ["mono"] + cmd
+  done = subprocess.run(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, text=True)
   return done.stdout
 
 def export_engine(fin, fout, famistudio_path=None):
