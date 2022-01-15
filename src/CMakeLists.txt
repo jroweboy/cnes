@@ -21,7 +21,7 @@ else()
     pc/renderer.c
     pc/sdl.c
   )
-  target_link_libraries(${module}
+  target_link_libraries(${module} 
     PUBLIC SDL2main SDL2-static SDL2_mixer
   )
 endif()

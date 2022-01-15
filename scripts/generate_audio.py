@@ -10,13 +10,15 @@ import pathlib
 import shutil
 import subprocess
 
-def fm(*args):
+def fm(*args, famistudio_path=None):
   # Default location for now is ../tools/famistudio/Famistudio
-  file_path = os.path.abspath(os.path.dirname(__file__))
-  done = subprocess.run([f"{file_path}/../tools/famistudio/Famistudio", *args], stderr=subprocess.STDOUT, stdout=subprocess.PIPE, text=True)
+  if not famistudio_path:
+    file_path = os.path.abspath(os.path.dirname(__file__))
+    famistudio_path = f"{file_path}/../tools/famistudio/Famistudio"
+  done = subprocess.run([famistudio_path, *args], stderr=subprocess.STDOUT, stdout=subprocess.PIPE, text=True)
   return done.stdout
 
-def export_engine(fin, fout):
+def export_engine(fin, fout, famistudio_path=None):
   fin = pathlib.Path(fin).resolve()
   fout = pathlib.Path(fout).resolve()
   project_name = fin.stem
@@ -26,8 +28,7 @@ def export_engine(fin, fout):
     "famistudio-asm-export",
     f"{fout}/all_project.s",
     "-famistudio-asm-format:ca65",
-    "-famistudio-generate-list"
-    )
+    "-famistudio-generate-list", famistudio_path=famistudio_path)
   song_indicies = []
   sfx_indicies = []
   with open(f"{fout}/all_project_songlist.inc", 'r') as file:
@@ -50,7 +51,7 @@ def export_engine(fin, fout):
     f"{fout}/{project_name}_sfx.s",
     f"-export-songs:{','.join(sfx_indicies)}",
     "-famistudio-asm-format:ca65",
-    "-famistudio-sfx-generate-list"))
+    "-famistudio-sfx-generate-list", famistudio_path=famistudio_path))
 
   # FIXUP: replace `sounds` inside the sfx file with a project specific name
   with open(f"{fout}/{project_name}_sfx.s", 'r') as f:
@@ -68,20 +69,20 @@ def export_engine(fin, fout):
     f"-famistudio-asm-seperate-song-pattern:{project_name}_{{song}}",
     f"-famistudio-asm-seperate-dmc-pattern:{project_name}",
     "-famistudio-asm-format:ca65",
-    "-famistudio-generate-list")
+    "-famistudio-generate-list", famistudio_path=famistudio_path)
 
 def bin2h(fin):
   done = subprocess.run([str(shutil.which("bin2header")), str(fin)], stderr=subprocess.STDOUT, stdout=subprocess.PIPE, text=True)
   return done.stdout
 
-def export_ogg(fin, fout):
+def export_ogg(fin, fout, famistudio_path=None):
   fin = pathlib.Path(fin).resolve()
   fout = pathlib.Path(fout).resolve()
   return fm(str(fin),
     "ogg-export",
-    f"{fout}/{fin.stem}.ogg")
+    f"{fout}/{fin.stem}.ogg", famistudio_path=famistudio_path)
 
-def generate_pc(fin, fout):
+def generate_pc(fin, fout, famistudio_path=None):
   fin = pathlib.Path(fin).resolve()
   fout = pathlib.Path(f"{fout}/pc/audio/").resolve()
   
@@ -91,7 +92,7 @@ def generate_pc(fin, fout):
   song_list_len = []
   for i, file in enumerate(fin.rglob('*.fms')):
     song = file.stem
-    export_ogg(file, fout)
+    export_ogg(file, fout, famistudio_path)
     print(bin2h(f"{fout}/{song}.ogg"))
     include += [f'#include "./{song}.ogg.h"']
     song_list += [f'{song}_ogg']
@@ -102,13 +103,13 @@ def generate_pc(fin, fout):
     f.write(f'''
 {os.linesep.join(include)}
 
-const unsigned int songs_len = {len(song_list)};
+const unsigned int cnes_songs_len = {len(song_list)};
 
-const unsigned char* song_list[] = {{
+const unsigned char* cnes_song_list[] = {{
   {(',' + os.linesep).join(song_list)}
 }};
 
-const unsigned int song_list_len[] = {{
+const unsigned int cnes_song_len[] = {{
   {(',' + os.linesep).join(song_list_len)}
 }};
 ''')
@@ -239,6 +240,8 @@ def main():
   parser.add_argument('-a', '--all', action="store_true")
   parser.add_argument('-n', '--nes', action="store_true")
   parser.add_argument('-p', '--pc', action="store_true")
+  parser.add_argument('-F', '--famistudio-path', type=str,
+                      help='Path to the famistudio executable (Default: `../tools/famistudio/FamiStudio.exe`)''')
   parser.add_argument('fin', metavar='in', type=str,
                       help='Input Directory of fms files to build the song data from')
   parser.add_argument('fout', metavar='out', type=str,
@@ -251,15 +254,15 @@ def main():
   create_dir_if_missing(f"{args.fout}/inc")
   
   if (args.all):
-    generate_pc(args.fin, args.fout)
-    generate_engine(args.fin, args.fout)
+    generate_pc(args.fin, args.fout, args.famistudio_path)
+    generate_engine(args.fin, args.fout, args.famistudio_path)
   elif (args.nes):
-    generate_engine(args.fin, args.fout)
+    generate_engine(args.fin, args.fout, args.famistudio_path)
   elif (args.pc):
-    generate_pc(args.fin, args.fout)
+    generate_pc(args.fin, args.fout, args.famistudio_path)
   else:
-    generate_pc(args.fin, args.fout)
-    generate_engine(args.fin, args.fout)
+    generate_pc(args.fin, args.fout, args.famistudio_path)
+    generate_engine(args.fin, args.fout, args.famistudio_path)
 
   with open(f"{args.fout}/inc/cnes_audio_gen.h", 'w') as f:
     f.write('''
@@ -276,7 +279,6 @@ def main():
 #endif //__NES__
 #endif //CNES_AUDIO_GEN_H
 ''')
-
 
 if __name__ == '__main__':
   main()

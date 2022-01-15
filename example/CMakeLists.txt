@@ -10,10 +10,8 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 # But we can do a little hacky-workaround to make that work
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CURRENT_BINARY_DIR}/cnes)
 
-find_package( PythonInterp 3 REQUIRED )
 
 set(gen ${CMAKE_BINARY_DIR}/gen)
-set(audio_gen ${gen}/inc/cnes_audio_gen.h)
 
 if (NES)
   set(BUILD_TYPE nes)
@@ -22,32 +20,48 @@ if (NES)
   set(platform_srcs
     src/nes.cfg
     src/nesheader.c
-    ${gen}/${BUILD_TYPE}/audio/engine_build.s
   )
   list(APPEND audio_gen ${gen}/nes/audio/engine_build.s)
 else()
   set(BUILD_TYPE pc)
   set(exe ${CMAKE_PROJECT_NAME})
   set(lib cnes.pc)
-  set(platform_srcs 
-    ${gen}/${BUILD_TYPE}/audio/internal.c
-  )
-  list(APPEND audio_gen 
-    ${gen}/pc/audio/internal.h
-    ${gen}/pc/audio/internal.c
+  set(platform_srcs
   )
 endif()
 
-add_custom_command(
-  OUTPUT ${audio_gen}
-  COMMAND ${PYTHON_EXECUTABLE} ${cnes_SOURCE_DIR}/scripts/generate_audio.py "--${BUILD_TYPE}" ${CMAKE_CURRENT_SOURCE_DIR}/assets/audio ${gen}
-  DEPENDS ${cnes_SOURCE_DIR}/scripts/generate_audio.py ${CMAKE_CURRENT_SOURCE_DIR}/assets/audio
-  COMMENT "Generating Music Headers/Data"
-)
+find_program(famistudio FamiStudio PATHS ${cnes_SOURCE_DIR}/tools/famistudio)
+if (NOT famistudio)
+  message(WARNING "Unable to find Famistudio. Skipping audio generation.")
+else()
+  message(STATUS "Famistudio found at ${famistudio}, audio gen enabled for ${CMAKE_CURRENT_SOURCE_DIR}/assets/audio")
+  find_package(PythonInterp 3 REQUIRED)
+
+  # add all required build items to the list of exports
+  set(audio_gen ${gen}/inc/cnes_audio_gen.h)
+  if (NES)
+    list(APPEND audio_gen
+      ${gen}/${BUILD_TYPE}/audio/engine_build.s
+    )
+  else()
+    list(APPEND audio_gen 
+      ${gen}/pc/audio/internal.h
+      ${gen}/pc/audio/internal.c
+    )
+  endif()
+
+  add_custom_command(
+    OUTPUT ${audio_gen}
+    COMMAND ${PYTHON_EXECUTABLE} ${cnes_SOURCE_DIR}/scripts/generate_audio.py --${BUILD_TYPE} --famistudio-path=${famistudio} ${CMAKE_CURRENT_SOURCE_DIR}/assets/audio ${gen}
+    DEPENDS ${cnes_SOURCE_DIR}/scripts/generate_audio.py ${CMAKE_CURRENT_SOURCE_DIR}/assets/audio
+    COMMENT "Generating Music Headers/Data with Famistudio"
+  )
+endif()
 
 add_executable(${exe}
   src/main.c
   ${platform_srcs}
+  ${audio_gen}
 )
 
 target_include_directories(${exe}

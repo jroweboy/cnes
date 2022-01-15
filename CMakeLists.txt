@@ -1,8 +1,17 @@
 cmake_minimum_required(VERSION 3.20)
 
+# CNES library
+project(cnes LANGUAGES C ASM)
+
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "6502")
   set(NES ON CACHE BOOL "" FORCE)
 endif()
+
+function(message)
+    if (NOT MESSAGE_QUIET)
+        _message(${ARGN})
+    endif()
+endfunction()
 
 if (NOT NES)
   # PC dependencies
@@ -18,7 +27,9 @@ if (NOT NES)
 
   if (NOT sdl2_POPULATED)
     FetchContent_Populate(SDL2)
+    set(MESSAGE_QUIET ON)
     add_subdirectory(${sdl2_SOURCE_DIR} ${sdl2_BINARY_DIR})
+    unset(MESSAGE_QUIET)
   endif ()
 
   FetchContent_Declare(
@@ -32,17 +43,16 @@ if (NOT NES)
   if (NOT sdl2mixer_POPULATED)
     FetchContent_Populate(SDL2Mixer)
     set(SUPPORT_OGG ON CACHE BOOL "" FORCE)
+    set(MESSAGE_QUIET ON)
     add_subdirectory(${sdl2mixer_SOURCE_DIR} ${sdl2mixer_BINARY_DIR})
+    unset(MESSAGE_QUIET)
   endif ()
+  
 endif()
-# CNES library
-
-project(cnes LANGUAGES C)
 
 set(CNES_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/inc)
 
 add_subdirectory(src)
-
 
 # set(INCLUDE_INSTALL_DIR inc/ CACHE FILEPATH "")
 # set(LIB_INSTALL_DIR lib/ CACHE FILEPATH "")

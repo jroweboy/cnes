@@ -10,7 +10,7 @@
       "request": "launch",
       "program": "${file}",
       "console": "integratedTerminal",
-      "args": ["./example/assets/audio/", "./example/bin/audio"]
+      "args": ["--famistudio-path=C:/dev/cnes/tools/famistudio/FamiStudio.exe", "C:/dev/cnes/example/assets/audio", "C:/dev/cnes/example/build/pc/gen"]
     },
     {
       "name": "g++.exe - Build and debug cmake",
