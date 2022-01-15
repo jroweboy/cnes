@@ -13,6 +13,7 @@ jobs:
     env:
       CC65_VERSION: 2.19
       CC65_PATH: /opt/cc65
+      FAMISTUDIO_VERSION: 3.2.2
       FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
       FAMISTUDIO_PATH: /opt/famistudio
     steps:
@@ -20,12 +21,12 @@ jobs:
       - uses: actions/cache@v2
         if: ${{ !env.ACT }}
         id: cache
-        name: Cache CC65
+        name: Cache Deps
         env:
-          cache-name: cache-cc65
+          cache-name: cache-deps
         with:
-          path: ${{ env.CC65_PATH }}
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.CC65_VERSION }}
+          path: /opt
+          key: ${{ runner.os }}-${{ env.cache-name }}-cc65${{ env.CC65_VERSION }}-fami${{ env.FAMISTUDIO_VERSION }}
       - name: Install cc65
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
@@ -38,7 +39,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           wget https://github.com/BleuBleu/FamiStudio/releases/download/${{ env.FAMISTUDIO_BIN }} -O famistudio.zip
-          unzip famistudio.zip
+          unzip famistudio.zip -d famistudio
           mv famistudio/ /opt/
       - name: Build NES Library
         run: |
