@@ -49,6 +49,7 @@ jobs:
           cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH=${{ env.CC65_PATH }} -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
           make
       - name: Build NES Example
+        uses: GabrielBB/xvfb-action@v1
         run: |
           cd example
           mkdir -p build && cd build
