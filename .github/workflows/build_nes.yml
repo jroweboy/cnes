@@ -44,6 +44,7 @@ jobs:
       - name: Install Famistudio
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
+          mkdir -p ${{ github.workspace }}/opt/famistudio
           wget https://github.com/BleuBleu/FamiStudio/releases/download/${{ env.FAMISTUDIO_BIN }} -O famistudio.zip
           unzip famistudio.zip -d ${{ github.workspace }}/opt/famistudio
       - name: Install gtk-sharp2
