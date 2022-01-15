@@ -35,6 +35,9 @@ jobs:
           cd cc65-${{ env.CC65_VERSION }}
           PREFIX=${{ github.workspace }}/opt/cc65 make
           PREFIX=${{ github.workspace }}/opt/cc65 make install
+      - name: Install gtk-sharp2
+        run: |
+          sudo apt-get install gtk-sharp2
       - name: Install Famistudio
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
