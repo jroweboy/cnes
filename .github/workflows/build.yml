@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CC65_VERSION: 2.19
-      CC65_REF: 18ae09f
+      CC65_REF: 18ae09f6821b3ed15121220100023b70ae393e30
       CC65_PATH: ${{ github.workspace }}/opt/cc65
       FAMISTUDIO_VERSION: 3.2.2
       FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
