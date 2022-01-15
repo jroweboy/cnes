@@ -1,6 +1,6 @@
 
 #include "cnes.h"
-#include "music.h"
+#include "cnes_audio_gen.h"
 
 void init_callback() {}
 

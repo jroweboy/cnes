@@ -1,41 +1,47 @@
 # CMake toolchain file for cc65
-# Downloaded from https://github.com/jviskari/cc65_cmake
-# This is largely a result of experimentation, so some things may be done
-# suboptimally/wrong. Some compilation options/CMake features may not work.
-# Some generators will also not work (like MSVS). Ninja has been tested to work.
-# What is supported: C, assembly, static libraries
 
-set( CMAKE_SYSTEM_NAME Generic )
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_PROCESSOR 6502)
 
-macro( __compilerCc65 lang )
-    set( CMAKE_${lang}_COMPILER cl65 CACHE PATH "${lang} compiler" )
-    set( CMAKE_${lang}_COMPILER_ID cc65 )
+set(CMAKE_C_COMPILER_ID cc65)
+set(CMAKE_C_COMPILER cl65)
+set(CMAKE_LINKER ld65)
 
-    # We cannot run tests for the cc65 compiler, because of cross-compilation,
-    # so force the compiler tests to passed.
-    set( CMAKE_${lang}_COMPILER_ID_RUN TRUE )
-    # Don't know if these are necessary.
-    set( CMAKE_${lang}_COMPILER_ID_WORKS TRUE )
-    set( CMAKE_${lang}_COMPILER_ID_FORCED TRUE )
+set(CMAKE_ASM_COMPILER cl65)
+set(CMAKE_ASM_COMPILER_ID ca65)
 
-    set( CMAKE_DEPFILE_FLAGS_${lang} "--create-dep <DEPFILE>")
-    set( CMAKE_${lang}_VERBOSE_FLAG "-v" )
-    set( CMAKE_${lang}_FLAGS_DEBUG_INIT "-g -D DEBUG --asm-define DEBUG"  )
-endmacro()
+find_program(_AR ar65)
+set(CMAKE_AR "${_AR}" CACHE FILEPATH "Archiver path override (prevents issues with cmake)")
 
-__compilerCc65( C )
-__compilerCc65( ASM )
+# 
+set(CC65_TARGET_FLAG "-t nes" CACHE STRING "Target flag for CC65")
+set(CC65_DEBUG_FLAG "-g -DDEBUG --asm-define DEBUG" CACHE STRING "Debug flags for CC65")
+set(CC65_OPT_MAX_FLAG "-Oisr" CACHE STRING "Max Optimization flags for CC65")
+set(CC65_OPT_MIN_SIZE "-O" CACHE STRING "Optimization flags for Min Size Build CC65")
 
-set( CMAKE_ASM_SOURCE_FILE_EXTENSIONS s;S;asm )
+# Default compiler flags
+set(CMAKE_ASM_FLAGS_DEBUG_INIT "${CC65_TARGET_FLAG} ${CC65_DEBUG_FLAG}")
+set(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG_INIT}" CACHE STRING "" FORCE)
+set(CMAKE_ASM_FLAGS_RELEASE_INIT "${CC65_TARGET_FLAG} ${CC65_OPT_MAX_FLAG}")
+set(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE_INIT}" CACHE STRING "" FORCE)
+set(CMAKE_ASM_FLAGS_MINSIZEREL_INIT "${CC65_TARGET_FLAG} ${CC65_OPT_MIN_SIZE}")
+set(CMAKE_ASM_FLAGS_MINSIZEREL "${CMAKE_ASM_FLAGS_MINSIZEREL_INIT}" CACHE STRING "" FORCE)
+set(CMAKE_ASM_FLAGS_RELWITHDEBINFO_INIT "${CC65_TARGET_FLAG} ${CC65_OPT_MAX_FLAG} ${CC65_DEBUG_FLAG}")
+set(CMAKE_ASM_FLAGS_RELWITHDEBINFO "${CMAKE_ASM_FLAGS_RELWITHDEBINFO_INIT}" CACHE STRING "" FORCE)
 
-# Not sure why CMake by default looks for the compilers, but not the archiver.
-# Force it to try to find the archiver.
-find_program( CMAKE_AR ar65 )
+set(CMAKE_C_FLAGS_DEBUG_INIT "${CC65_TARGET_FLAG} ${CC65_DEBUG_FLAG}")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG_INIT}" CACHE STRING "" FORCE)
+set(CMAKE_C_FLAGS_RELEASE_INIT "${CC65_TARGET_FLAG} ${CC65_OPT_MAX_FLAG}")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE_INIT}" CACHE STRING "" FORCE)
+set(CMAKE_C_FLAGS_MINSIZEREL_INIT "${CC65_TARGET_FLAG} ${CC65_OPT_MIN_SIZE}")
+set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL_INIT}" CACHE STRING "" FORCE)
+set(CMAKE_C_FLAGS_RELWITHDEBINFO_INIT "${CC65_TARGET_FLAG} ${CC65_OPT_MAX_FLAG} ${CC65_DEBUG_FLAG}")
+set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO_INIT}" CACHE STRING "" FORCE)
 
-# \note Need to delete the old file first because ar65 can only add files
-#       into an archive (or remove named files, but we don't know the names).
-set( CMAKE_C_CREATE_STATIC_LIBRARY
-    "<CMAKE_COMMAND> -E remove <TARGET> "
+set(CMAKE_ASM_SOURCE_FILE_EXTENSIONS s;S;asm)
+
+set(CMAKE_C_CREATE_STATIC_LIBRARY
+    "<CMAKE_COMMAND> -E remove <TARGET>"
     "<CMAKE_AR> a <TARGET> <LINK_FLAGS> <OBJECTS>"
 )
-set( CMAKE_ASM_CREATE_STATIC_LIBRARY ${CMAKE_C_CREATE_STATIC_LIBRARY} )
+set(CMAKE_ASM_CREATE_STATIC_LIBRARY ${CMAKE_C_CREATE_STATIC_LIBRARY})

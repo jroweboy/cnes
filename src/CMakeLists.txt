@@ -1,10 +1,10 @@
-if (CMAKE_CXX_COMPILER_ID MATCHES "cc65")
+if (NES)
   set(module cnes.nes)
 else()
   set(module cnes.pc)
 endif()
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "cc65")
+if (NES)
   add_library(${module} STATIC
     nes/audio.s
     nes/common.s

@@ -261,20 +261,20 @@ def main():
     generate_pc(args.fin, args.fout)
     generate_engine(args.fin, args.fout)
 
-  with open(f"{args.fout}/inc/music.h", 'w') as f:
+  with open(f"{args.fout}/inc/cnes_audio_gen.h", 'w') as f:
     f.write('''
 /**
  * Generated include file by the CNES build process. Include these
  * macros to use with the 
  */
-#ifndef CNES_GENERATED_MUSIC_H
-#define CNES_GENERATED_MUSIC_H
+#ifndef CNES_AUDIO_GEN_H
+#define CNES_AUDIO_GEN_H
 #ifdef __NES__
 #include "../nes/audio/internal.h"
 #else
 #include "../pc/audio/internal.h"
 #endif //__NES__
-#endif //CNES_GENERATED_MUSIC_h
+#endif //CNES_AUDIO_GEN_H
 ''')
 
 

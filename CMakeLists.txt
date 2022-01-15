@@ -1,40 +1,43 @@
+cmake_minimum_required(VERSION 3.20)
 
-cmake_minimum_required(VERSION 3.11)
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "6502")
+  set(NES ON CACHE BOOL "" FORCE)
+endif()
 
-# PC dependencies
+if (NOT NES)
+  # PC dependencies
+  include(FetchContent)
 
-include(FetchContent)
+  FetchContent_Declare(
+    SDL2
+    GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
+    GIT_TAG release-2.0.20
+  )
 
-FetchContent_Declare(
-  SDL2
-  GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
-  GIT_TAG release-2.0.20
-)
+  FetchContent_GetProperties(SDL2)
 
-FetchContent_GetProperties(SDL2)
+  if (NOT sdl2_POPULATED)
+    FetchContent_Populate(SDL2)
+    add_subdirectory(${sdl2_SOURCE_DIR} ${sdl2_BINARY_DIR})
+  endif ()
 
-if (NOT sdl2_POPULATED)
-  FetchContent_Populate(SDL2)
-  add_subdirectory(${sdl2_SOURCE_DIR} ${sdl2_BINARY_DIR})
-endif ()
+  FetchContent_Declare(
+    SDL2Mixer
+    GIT_REPOSITORY "https://github.com/libsdl-org/SDL_mixer.git"
+    GIT_TAG master
+  )
 
-FetchContent_Declare(
-  SDL2Mixer
-  GIT_REPOSITORY "https://github.com/libsdl-org/SDL_mixer.git"
-  GIT_TAG master
-)
+  FetchContent_GetProperties(SDL2Mixer)
 
-FetchContent_GetProperties(SDL2Mixer)
-
-if (NOT sdl2mixer_POPULATED)
-  FetchContent_Populate(SDL2Mixer)
-  set(SUPPORT_OGG ON FORCE CACHE BOOL "")
-  add_subdirectory(${sdl2mixer_SOURCE_DIR} ${sdl2mixer_BINARY_DIR})
-endif ()
-
+  if (NOT sdl2mixer_POPULATED)
+    FetchContent_Populate(SDL2Mixer)
+    set(SUPPORT_OGG ON CACHE BOOL "" FORCE)
+    add_subdirectory(${sdl2mixer_SOURCE_DIR} ${sdl2mixer_BINARY_DIR})
+  endif ()
+endif()
 # CNES library
 
-project(cnes LANGUAGES C ASM)
+project(cnes LANGUAGES C)
 
 set(CNES_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/inc)
 
