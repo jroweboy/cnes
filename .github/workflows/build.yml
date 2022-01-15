@@ -50,11 +50,7 @@ jobs:
           make
       - name: Build NES Example
         run: |
-            cd example
-            mkdir -p build && cd build
-            cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH="${{ env.CC65_PATH }}" -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
-      - name: Run build on headless xvfb
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          run: |
-            make
+          cd example
+          mkdir -p build && cd build
+          cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH="${{ env.CC65_PATH }}" -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
+          make

@@ -18,8 +18,13 @@ def fm(*args, famistudio_path=None):
     famistudio_path = f"{file_path}/../tools/famistudio/Famistudio"
   cmd = [famistudio_path, *args]
   if sys.platform != "win32":
-    print (f'Calling FS with mono: ${str(shutil.which("mono"))}')
-    cmd = [str(shutil.which("mono"))] + cmd
+    mono = str(shutil.which("mono"))
+    print (f'Calling FS with mono: ${mono}')
+    cmd = [mono] + cmd
+    if 'CI' in os.environ:
+      xvfb = str(shutil.which("xvfb-run"))
+      print (f'On CI so use headless as well: ${xvfb}')
+      cmd = [xvfb, '--auto-servernum'] + cmd
   done = subprocess.run(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, text=True)
   print(f"FS output: {done}")
   return done.stdout
