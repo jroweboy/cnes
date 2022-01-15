@@ -1,5 +1,5 @@
 
-name: Build Pull Request
+name: Build PC
 
 on: [pull_request, push]
 
@@ -8,7 +8,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build_nes:
+  build_pc:
+    name: PC Build
     runs-on: ubuntu-latest
     env:
       SDL_REF: release-2.0.20 # Note: This is hardcoded in cnes/CMakeLists.txt

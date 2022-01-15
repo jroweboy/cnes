@@ -2,8 +2,8 @@
 
 **Framework for building NES games that run natively on PC**
 
-![NES](https://github.com/jroweboy/cnes/actions/workflows/build_nes/badge.svg)
-![PC](https://github.com/jroweboy/cnes/actions/workflows/build_pc/badge.svg)
+![NES](https://github.com/jroweboy/cnes/actions/workflows/build_nes.yml/badge.svg)
+![PC](https://github.com/jroweboy/cnes/actions/workflows/build_pc.yml/badge.svg)
 
 ## What is CNES?
 

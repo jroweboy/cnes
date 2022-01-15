@@ -1,5 +1,5 @@
 
-name: Build Pull Request
+name: Build NES
 
 on: [pull_request, push]
 
@@ -9,6 +9,7 @@ concurrency:
 
 jobs:
   build_nes:
+    name: NES Build
     runs-on: ubuntu-latest
     env:
       CC65_VERSION: 2.19
