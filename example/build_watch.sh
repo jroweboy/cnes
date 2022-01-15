@@ -10,7 +10,7 @@
         then
             # clear;
             echo '================= Building ================='
-            if (cd build/pc; ninja); then
+            if (cd build/; ninja); then
                 echo "build success"
             else
                 echo "build failed"

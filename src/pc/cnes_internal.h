@@ -11,7 +11,6 @@
 #define LOG_RENDER 2
 #define LOG_JOYPAD 3
 
-
 // Init functions
 
 int renderer_init();

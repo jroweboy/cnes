@@ -16,7 +16,7 @@ if (NES)
 else()
   add_library(${module} STATIC
     pc/audio.c
-    pc/internal.h
+    pc/cnes_internal.h
     pc/joypad.c
     pc/renderer.c
     pc/sdl.c

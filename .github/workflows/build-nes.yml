@@ -52,11 +52,11 @@ jobs:
       - name: Build NES Library
         run: |
           mkdir -p build && cd build
-          cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH=${{ env.CC65_PATH }} -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
+          cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH=${{ env.CC65_PATH }} -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
           make
       - name: Build NES Example
         run: |
           cd example
           mkdir -p build && cd build
-          cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH="${{ env.CC65_PATH }}" -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
+          cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH="${{ env.CC65_PATH }}" -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
           make VERBOSE=1

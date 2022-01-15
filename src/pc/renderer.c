@@ -1,6 +1,6 @@
 
 #include "cnes.h"
-#include "internal.h"
+#include "cnes_internal.h"
 #include <SDL2/SDL.h>
 
 static SDL_Window* win;

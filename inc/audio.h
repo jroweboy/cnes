@@ -40,7 +40,7 @@ void __LIB_CALLSPEC sfx_play(u8 sfx);
 #else
 extern const unsigned char* cnes_song_list[];
 extern const unsigned int cnes_song_len[];
-extern const unsigned int cnes_songs_len;
+extern const unsigned int cnes_song_list_len;
 
 void __LIB_CALLSPEC music_start(u8 song);
 

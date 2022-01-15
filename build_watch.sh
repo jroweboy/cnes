@@ -8,8 +8,9 @@ tools/inotifywait.exe -m -r ./src/ ./inc/ ./Makefile |
         # For some reason saving a file generates two modify
         if ((flag))
         then
-            clear;
-            if make; then
+            # clear;
+            echo '================= Building ================='
+            if (cd build/; ninja); then
                 echo "build success"
             else
                 echo "build failed"

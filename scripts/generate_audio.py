@@ -112,7 +112,7 @@ def generate_pc(fin, fout, famistudio_path=None):
     f.write(f'''
 {os.linesep.join(include)}
 
-const unsigned int cnes_songs_len = {len(song_list)};
+const unsigned int cnes_song_list_len = {len(song_list)};
 
 const unsigned char* cnes_song_list[] = {{
   {(',' + os.linesep).join(song_list)}

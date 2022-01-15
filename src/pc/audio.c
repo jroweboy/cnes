@@ -1,6 +1,6 @@
 
 #include "cnes.h"
-#include "internal.h"
+#include "cnes_internal.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
@@ -21,15 +21,15 @@ int audio_init() {
     return EXIT_FAILURE;
   }
 
-  songs = malloc(songs_len * sizeof(Mix_Music*));
+  songs = malloc(cnes_song_list_len * sizeof(Mix_Music*));
   if (!songs) {
     SDL_LogError(LOG_AUDIO, "Umm malloc?\n");
     return EXIT_FAILURE;
   }
 
   // Now initialize the songs with the provided songs
-  for (int i=0; i<songs_len; i++) {
-    SDL_RWops* ops = SDL_RWFromConstMem((void*)song_list[i], song_list_len[i]);
+  for (int i=0; i<cnes_song_list_len; i++) {
+    SDL_RWops* ops = SDL_RWFromConstMem((void*)cnes_song_list[i], cnes_song_len[i]);
     songs[i] = Mix_LoadMUS_RW(ops, 1);
   }
 

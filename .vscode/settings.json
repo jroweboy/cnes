@@ -20,6 +20,8 @@
         "cstdio": "c",
         "pc_build.h": "c",
         "music.h": "c",
-        "engine_build.h": "c"
+        "engine_build.h": "c",
+        "internal.h": "c",
+        "cnes_internal.h": "c"
     }
 }
