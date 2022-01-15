@@ -128,7 +128,7 @@ const unsigned int cnes_song_len[] = {{
 ''') 
 
 
-def generate_engine(fin, fout):
+def generate_engine(fin, fout, famistudio_path=None):
   '''Builds the asm module that should be linked with the build to provide audio
   This builds from all the FMS provided in the input directory.'''
 
