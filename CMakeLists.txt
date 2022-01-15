@@ -3,6 +3,39 @@ cmake_minimum_required(VERSION 3.20)
 # CNES library
 project(cnes LANGUAGES C ASM)
 
+if (NOT CNES_BUILD_SINGLE AND (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR))
+  # use external project add to build the application into separate subfolders
+  include(ExternalProject)
+  get_filename_component(CNES_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/cmake/cc65-toolchain.cmake ABSOLUTE)
+  get_filename_component(CNES_PREFIX_PATH ${CMAKE_SOURCE_DIR}/tools/cc65 ABSOLUTE)
+  ExternalProject_Add(nes
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}
+    BINARY_DIR ${CMAKE_BINARY_DIR}/nes
+    BUILD_ALWAYS 1
+    INSTALL_COMMAND cmake -E echo "Skipping install step."
+    TEST_COMMAND cmake -E echo "Skipping test step."
+    CMAKE_ARGS
+      -DCMAKE_PREFIX_PATH:PATH=${CNES_PREFIX_PATH}
+      -DCMAKE_FRAMEWORK_PATH:PATH=${CNES_FRAMEWORK_PATH}
+      -DCMAKE_TOOLCHAIN_FILE:PATH=${CNES_TOOLCHAIN_FILE}
+      -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+      -DCMAKE_MAKE_PROGRAM:FILEPATH=${CMAKE_MAKE_PROGRAM}
+      -DCNES_BUILD_SINGLE=On
+  )
+  ExternalProject_Add(pc
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}
+    BINARY_DIR ${CMAKE_BINARY_DIR}/pc
+    BUILD_ALWAYS 1
+    INSTALL_COMMAND cmake -E echo "Skipping install step."
+    TEST_COMMAND cmake -E echo "Skipping test step."
+    CMAKE_ARGS
+      -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+      -DCMAKE_MAKE_PROGRAM:FILEPATH=${CMAKE_MAKE_PROGRAM}
+      -DCNES_BUILD_SINGLE=On
+  )
+  return()
+endif()
+
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "6502")
   set(NES ON CACHE BOOL "" FORCE)
 endif()

@@ -1,0 +1,50 @@
+
+name: Build Pull Request
+
+on: [pull_request, push]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_nes:
+    runs-on: ubuntu-latest
+    env:
+      SDL_REF: release-2.0.20 # Note: This is hardcoded in cnes/CMakeLists.txt
+      FAMISTUDIO_VERSION: 3.2.2
+      FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
+      FAMISTUDIO_PATH: ${{ github.workspace }}/opt/famistudio
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        if: ${{ !env.ACT }}
+        id: cache
+        name: Cache Deps
+        env:
+          cache-name: cache-deps
+        with:
+          path: |
+            ${{ github.workspace }}/opt
+            ${{ github.workspace }}/build/_deps
+            ${{ github.workspace }}/example/build/_deps
+          key: ${{ runner.os }}-${{ env.cache-name }}-fami${{ env.FAMISTUDIO_VERSION }}-sdl${{ env.SDL_REF }}
+      - name: Install Famistudio
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          wget https://github.com/BleuBleu/FamiStudio/releases/download/${{ env.FAMISTUDIO_BIN }} -O famistudio.zip
+          unzip famistudio.zip -d ${{ github.workspace }}/opt/famistudio
+      - name: Install gtk-sharp2
+        run: |
+          sudo apt-get install gtk-sharp2
+      - name: Build PC Library
+        run: |
+          mkdir -p build && cd build
+          cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
+          make
+      - name: Build PC Example
+        run: |
+          cd example
+          mkdir -p build && cd build
+          cmake -G "Unix Makefiles" -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
+          make

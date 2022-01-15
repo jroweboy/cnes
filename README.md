@@ -2,6 +2,9 @@
 
 **Framework for building NES games that run natively on PC**
 
+![NES](https://github.com/jroweboy/cnes/actions/workflows/build_nes/badge.svg)
+![PC](https://github.com/jroweboy/cnes/actions/workflows/build_pc/badge.svg)
+
 ## What is CNES?
 
 CNES is a framework that focuses on a cross platform solution for making
