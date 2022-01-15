@@ -19,14 +19,11 @@ def fm(*args, famistudio_path=None):
   cmd = [famistudio_path, *args]
   if sys.platform != "win32":
     mono = str(shutil.which("mono"))
-    print (f'Calling FS with mono: ${mono}')
     cmd = [mono] + cmd
     if 'CI' in os.environ:
       xvfb = str(shutil.which("xvfb-run"))
-      print (f'On CI so use headless as well: ${xvfb}')
       cmd = [xvfb, '--auto-servernum'] + cmd
   done = subprocess.run(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, text=True)
-  print(f"FS output: {done}")
   return done.stdout
 
 def export_engine(fin, fout, famistudio_path=None):
@@ -56,7 +53,7 @@ def export_engine(fin, fout, famistudio_path=None):
   os.remove(f"{fout}/all_project.dmc")
   os.remove(f"{fout}/all_project.s")
 
-  print(f"Exporting SFX (project indicies: {sfx_indicies})")
+  print(f"Exporting NES SFX (project indicies: {sfx_indicies})")
   print(fm(str(fin),
     "famistudio-asm-sfx-export",
     f"{fout}/{project_name}_sfx.s",
@@ -71,7 +68,7 @@ def export_engine(fin, fout, famistudio_path=None):
   with open(f"{fout}/{project_name}_sfx.s", 'w') as f:
     f.write(s)
 
-  print(f"Exporting songs (project indicies: {song_indicies})")
+  print(f"Exporting NES songs (project indicies: {song_indicies})")
   return fm(str(fin),
     "famistudio-asm-export",
     f"{fout}/",
@@ -103,6 +100,7 @@ def generate_pc(fin, fout, famistudio_path=None):
   song_list_len = []
   for i, file in enumerate(fin.rglob('*.fms')):
     song = file.stem
+    print("Exporting PC audio tracks (ogg) and converting them to headers")
     export_ogg(file, fout, famistudio_path)
     print(bin2h(f"{fout}/{song}.ogg"))
     include += [f'#include "./{song}.ogg.h"']

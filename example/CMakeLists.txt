@@ -10,7 +10,6 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 # But we can do a little hacky-workaround to make that work
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CURRENT_BINARY_DIR}/cnes)
 
-
 set(gen ${CMAKE_BINARY_DIR}/gen)
 
 if (NES)
@@ -29,9 +28,8 @@ else()
   set(platform_srcs
   )
 endif()
-set(CMAKE_FIND_DEBUG_MODE TRUE)
+
 find_file(famistudio NAMES FamiStudio FamiStudio.exe PATHS ${cnes_SOURCE_DIR}/tools/famistudio)
-set(CMAKE_FIND_DEBUG_MODE FALSE)
 if (NOT famistudio)
   message(WARNING "Unable to find Famistudio. Skipping audio generation.")
 else()

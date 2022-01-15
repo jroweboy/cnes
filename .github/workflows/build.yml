@@ -41,14 +41,14 @@ jobs:
           cd cc65
           PREFIX=${{ github.workspace }}/opt/cc65 make
           PREFIX=${{ github.workspace }}/opt/cc65 make install
-      - name: Install gtk-sharp2
-        run: |
-          sudo apt-get install gtk-sharp2
       - name: Install Famistudio
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           wget https://github.com/BleuBleu/FamiStudio/releases/download/${{ env.FAMISTUDIO_BIN }} -O famistudio.zip
           unzip famistudio.zip -d ${{ github.workspace }}/opt/famistudio
+      - name: Install gtk-sharp2
+        run: |
+          sudo apt-get install gtk-sharp2
       - name: Build NES Library
         run: |
           mkdir -p build && cd build
