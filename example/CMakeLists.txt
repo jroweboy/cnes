@@ -29,8 +29,9 @@ else()
   set(platform_srcs
   )
 endif()
-
+set(CMAKE_FIND_DEBUG_MODE TRUE)
 find_program(famistudio FamiStudio PATHS ${cnes_SOURCE_DIR}/tools/famistudio)
+set(CMAKE_FIND_DEBUG_MODE FALSE)
 if (NOT famistudio)
   message(WARNING "Unable to find Famistudio. Skipping audio generation.")
 else()
