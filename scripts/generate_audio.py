@@ -18,8 +18,10 @@ def fm(*args, famistudio_path=None):
     famistudio_path = f"{file_path}/../tools/famistudio/Famistudio"
   cmd = [famistudio_path, *args]
   if sys.platform != "win32":
-    cmd = ["mono"] + cmd
+    print (f'Calling FS with mono: ${str(shutil.which("mono"))}')
+    cmd = [str(shutil.which("mono"))] + cmd
   done = subprocess.run(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, text=True)
+  print(f"FS output: {done}")
   return done.stdout
 
 def export_engine(fin, fout, famistudio_path=None):
