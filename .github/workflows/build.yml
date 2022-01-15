@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CC65_VERSION: 2.19
-      CC65_PATH: /opt/cc65
+      CC65_PATH: ${{ github.workspace }}/opt/cc65
       FAMISTUDIO_VERSION: 3.2.2
       FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
-      FAMISTUDIO_PATH: /opt/famistudio
+      FAMISTUDIO_PATH: ${{ github.workspace }}/opt/famistudio
     steps:
       - uses: actions/checkout@v2
       - uses: actions/cache@v2
@@ -25,7 +25,7 @@ jobs:
         env:
           cache-name: cache-deps
         with:
-          path: /opt
+          path: ${{ github.workspace }}/opt
           key: ${{ runner.os }}-${{ env.cache-name }}-cc65${{ env.CC65_VERSION }}-fami${{ env.FAMISTUDIO_VERSION }}
       - name: Install cc65
         if: steps.cache.outputs.cache-hit != 'true'
@@ -33,14 +33,13 @@ jobs:
           wget https://github.com/cc65/cc65/archive/V${{ env.CC65_VERSION }}.zip -O cc65-${{ env.CC65_VERSION }}.zip
           unzip cc65-${{ env.CC65_VERSION }}.zip
           cd cc65-${{ env.CC65_VERSION }}
-          PREFIX=/opt/cc65 make
-          PREFIX=/opt/cc65 make install
+          PREFIX=${{ github.workspace }}/opt/cc65 make
+          PREFIX=${{ github.workspace }}/opt/cc65 make install
       - name: Install Famistudio
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           wget https://github.com/BleuBleu/FamiStudio/releases/download/${{ env.FAMISTUDIO_BIN }} -O famistudio.zip
-          unzip famistudio.zip -d famistudio
-          mv famistudio/ /opt/
+          unzip famistudio.zip -d ${{ github.workspace }}/opt/famistudio
       - name: Build NES Library
         run: |
           mkdir -p build && cd build
@@ -50,5 +49,5 @@ jobs:
         run: |
           cd example
           mkdir -p build && cd build
-          cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH="${{ env.CC65_PATH }};${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
+          cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH="${{ env.CC65_PATH }}" -DFAMISTUDIO_ROOT="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
           make
