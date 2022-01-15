@@ -139,7 +139,7 @@ def generate_engine(fin, fout, famistudio_path=None):
   segments = set()
   for file in fin.rglob('*.fms'):
     project_name = file.stem
-    cmd_output = export_engine(str(file), fout)
+    cmd_output = export_engine(str(file), fout, famistudio_path)
     if not cmd_output:
       continue
     print (cmd_output)
