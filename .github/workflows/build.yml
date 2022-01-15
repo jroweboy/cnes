@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CC65_VERSION: 2.19
+      CC65_TAG: 18ae09f
       CC65_PATH: ${{ github.workspace }}/opt/cc65
       FAMISTUDIO_VERSION: 3.2.2
       FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
@@ -27,12 +28,17 @@ jobs:
         with:
           path: ${{ github.workspace }}/opt
           key: ${{ runner.os }}-${{ env.cache-name }}-cc65${{ env.CC65_VERSION }}-fami${{ env.FAMISTUDIO_VERSION }}
-      - name: Install cc65
+      - name: Checkout cc65
+        uses: actions/checkout@v2
+        if: steps.cache.outputs.cache-hit != 'true'
+        with:
+          repository: cc65/cc65
+          ref: ${{ env.CC65_TAG }}
+          path: './cc65'
+      - name: Build CC65
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          wget https://github.com/cc65/cc65/archive/V${{ env.CC65_VERSION }}.zip -O cc65-${{ env.CC65_VERSION }}.zip
-          unzip cc65-${{ env.CC65_VERSION }}.zip
-          cd cc65-${{ env.CC65_VERSION }}
+          cd cc65
           PREFIX=${{ github.workspace }}/opt/cc65 make
           PREFIX=${{ github.workspace }}/opt/cc65 make install
       - name: Install gtk-sharp2
