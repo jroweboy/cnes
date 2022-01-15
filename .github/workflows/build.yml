@@ -40,14 +40,14 @@ jobs:
         run: |
           wget https://github.com/BleuBleu/FamiStudio/releases/download/${{ env.FAMISTUDIO_BIN }} -O famistudio.zip
           unzip famistudio.zip -d ${{ github.workspace }}/opt/famistudio
-      # - name: Build NES Library
-      #   run: |
-      #     mkdir -p build && cd build
-      #     cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH=${{ env.CC65_PATH }} -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
-      #     make
-      # - name: Build NES Example
-      #   run: |
-      #     cd example
-      #     mkdir -p build && cd build
-      #     cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH="${{ env.CC65_PATH }}" -DCMAKE_PROGRAM_PATH="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
-      #     make
+      - name: Build NES Library
+        run: |
+          mkdir -p build && cd build
+          cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH=${{ env.CC65_PATH }} -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
+          make
+      - name: Build NES Example
+        run: |
+          cd example
+          mkdir -p build && cd build
+          cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH="${{ env.CC65_PATH }}" -DCMAKE_PROGRAM_PATH="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
+          make
