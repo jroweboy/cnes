@@ -104,7 +104,7 @@ target_include_directories(${exe}
   PRIVATE $<BUILD_INTERFACE:${gen}/inc>
 )
 
-target_link_libraries(${exe} -Wl,--start-group ${lib})
+target_link_libraries(${exe} PRIVATE -Wl,--start-group ${lib})
 
 if (NES)
   target_link_options(${exe} PRIVATE
@@ -112,4 +112,6 @@ if (NES)
     -C ${CMAKE_CURRENT_SOURCE_DIR}/src/nes.cfg
     --ld-args --dbgfile,${CMAKE_BINARY_DIR}/${exe}.dbg
   )
+else()
+  target_link_libraries(${exe} PRIVATE -static)
 endif()

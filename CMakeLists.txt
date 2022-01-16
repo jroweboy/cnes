@@ -50,6 +50,8 @@ if (NOT NES)
   # PC dependencies
   include(FetchContent)
 
+  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
   FetchContent_Declare(
     SDL2
     GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
@@ -57,10 +59,11 @@ if (NOT NES)
   )
 
   FetchContent_GetProperties(SDL2)
-
   if (NOT sdl2_POPULATED)
     FetchContent_Populate(SDL2)
-    set(MESSAGE_QUIET ON)
+    set(SDL_STATIC_PIC ON CACHE BOOL "" FORCE)
+    set(SDL_SHARED ON CACHE BOOL "" FORCE)
+    set(MESSAGE_QUIET OFF)
     add_subdirectory(${sdl2_SOURCE_DIR} ${sdl2_BINARY_DIR})
     unset(MESSAGE_QUIET)
   endif ()
@@ -76,7 +79,7 @@ if (NOT NES)
   if (NOT sdl2mixer_POPULATED)
     FetchContent_Populate(SDL2Mixer)
     set(SUPPORT_OGG ON CACHE BOOL "" FORCE)
-    set(MESSAGE_QUIET ON)
+    set(MESSAGE_QUIET OFF)
     add_subdirectory(${sdl2mixer_SOURCE_DIR} ${sdl2mixer_BINARY_DIR})
     unset(MESSAGE_QUIET)
   endif ()
