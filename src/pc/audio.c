@@ -1,8 +1,8 @@
 
 #include "cnes.h"
 #include "cnes_internal.h"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
+#include <SDL.h>
+#include <SDL_mixer.h>
 
 static Mix_Music** songs;
 

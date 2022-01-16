@@ -2,7 +2,7 @@
 #ifndef _INTERNAL_H
 #define _INTERNAL_H
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 // Logging defines
 
