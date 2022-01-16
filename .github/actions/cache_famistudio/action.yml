@@ -15,7 +15,7 @@ inputs:
   gtkVersion:
     description: "GTK Version (Linux Only)"
     required: false
-    default: "2.12.40-2"
+    default: "2.12.40-3"
 runs:
   using: "composite"
   steps:
@@ -42,6 +42,7 @@ runs:
     - env:
         CACHE_HIT: ${{steps.cache_gtk.outputs.cache-hit}}
       run: |
+        echo "matrix.os: $MATRIX_OS"
         if [[ "$CACHE_HIT" == 'true' ]]; then
           sudo cp -rf ${{ github.workspace }}/opt/gtk-sharp2/* /
         else
