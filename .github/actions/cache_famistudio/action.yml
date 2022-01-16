@@ -1,0 +1,47 @@
+name: Cache FamiStudio
+inputs:
+  fsBin:
+    required: true
+  fsVersion:
+    required: false
+    default: "3.2.2"
+  fsPath:
+    required: false
+    default: ${{ github.workspace }}/opt/famistudio
+  gtkVersion:
+    required: false
+    default: "2.12.40-2"
+run:
+  using: "composite"
+  steps:
+    # Cache Famistudio
+    - uses: actions/cache@v2
+      id: cache_famistudio
+      with:
+        path: ${{ github.workspace }}/opt/famistudio
+        key: ${{ runner.os }}-fami${{ inputs.fsVersion }}
+    # Download Famistudio
+    - if: steps.cache_famistudio.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p ${{ github.workspace }}/opt/famistudio
+        wget https://github.com/BleuBleu/FamiStudio/releases/download/${{ inputs.fsBin }} -O famistudio.zip
+        unzip famistudio.zip -d ${{ github.workspace }}/opt/famistudio
+    # Cache GTK2-Sharp (Linux)
+    - uses: actions/cache@v2
+      if: matrix.os == 'ubuntu-latest'
+      id: cache_gtk
+      with:
+        path: ${{ github.workspace }}/opt/gtk-sharp2
+        key: ${{ runner.os }}-gtk${{ inputs.gtkVersion }}
+    # Install GTK2-Sharp (Linux)
+    - if: matrix.os == 'ubuntu-latest'
+      env:
+        CACHE_HIT: ${{steps.cache_gtk.outputs.cache-hit}}
+      run: |
+        if [[ "$CACHE_HIT" == 'true' ]]; then
+          sudo cp -rf ${{ github.workspace }}/opt/gtk-sharp2/* /
+        else
+          sudo apt-get install --yes gtk-sharp2="${{ inputs.gtkVersion }}"
+          mkdir -p ${{ github.workspace }}/opt/gtk-sharp2/
+          sudo dpkg -L gtk-sharp2 | while IFS= read -r f; do if test -f $f; then echo $f; fi; done | xargs cp --parents --target-directory ${{ github.workspace }}/opt/gtk-sharp2/
+        fi

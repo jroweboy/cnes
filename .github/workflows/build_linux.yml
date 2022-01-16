@@ -8,11 +8,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  FAMISTUDIO_VERSION: 3.2.2
   FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
   FAMISTUDIO_PATH: ${{ github.workspace }}/opt/famistudio
-  # Change this if you need to cache bust for whatever reason
-  CACHE_NAME: deps
 
 jobs:
   build_linux_lib:
@@ -20,49 +17,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/cache@v2
-        if: ${{ !env.ACT }}
-        id: cache
-        name: Cache Deps
-        with:
-          path: |
-            ${{ github.workspace }}/opt
-            ${{ github.workspace }}/build/_deps
-            ${{ github.workspace }}/example/build/_deps
-          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-sdl${{ hashFiles('cmake/buildSDL2.cmake') }}
+      - uses: ./.github/actions/cache_sdl
       - name: Build PC Library
         run: |
           mkdir -p build && cd build
           cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
-          make VERBOSE=1
+          make -j2
 
   build_linux_example:
     name: Linux Example Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/cache@v2
-        if: ${{ !env.ACT }}
-        id: cache
-        name: Cache Deps
+      - uses: ./.github/actions/cache_sdl
+      - uses: ./.github/actions/cache_famistudio
         with:
-          path: |
-            ${{ github.workspace }}/opt
-            ${{ github.workspace }}/build/_deps
-            ${{ github.workspace }}/example/build/_deps
-          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-fami${{ env.FAMISTUDIO_VERSION }}-sdl${{ hashFiles('cmake/buildSDL2.cmake') }}
-      - name: Install Famistudio
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p ${{ github.workspace }}/opt/famistudio
-          wget https://github.com/BleuBleu/FamiStudio/releases/download/${{ env.FAMISTUDIO_BIN }} -O famistudio.zip
-          unzip famistudio.zip -d ${{ github.workspace }}/opt/famistudio
-      - name: Install gtk-sharp2
-        run: |
-          sudo apt-get install gtk-sharp2
+          fsBin: ${{ env.FAMISTUDIO_BIN }}
       - name: Build PC Example
         run: |
-          cd example
-          mkdir -p build && cd build
+          mkdir -p example/build && cd example/build
           cmake -G "Unix Makefiles" -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
-          make VERBOSE=1
+          make -j2

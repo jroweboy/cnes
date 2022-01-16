@@ -8,14 +8,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CC65_VERSION: 2.19
-  CC65_REF: 18ae09f6821b3ed15121220100023b70ae393e30
   CC65_PATH: ${{ github.workspace }}/opt/cc65
-  FAMISTUDIO_VERSION: 3.2.2
-  FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
   FAMISTUDIO_PATH: ${{ github.workspace }}/opt/famistudio
-  # Change this if you need to cache bust for whatever reason
-  CACHE_NAME: deps
+  FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
 
 jobs:
   build_nes_lib:
@@ -23,26 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/cache@v2
-        if: ${{ !env.ACT }}
-        id: cache
-        name: Cache Deps
-        with:
-          path: ${{ github.workspace }}/opt
-          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-cc65${{ env.CC65_VERSION }}-${{ env.CC65_REF }}
-      - name: Checkout cc65
-        uses: actions/checkout@v2
-        if: steps.cache.outputs.cache-hit != 'true'
-        with:
-          repository: cc65/cc65
-          ref: ${{ env.CC65_REF }}
-          path: './cc65'
-      - name: Build CC65
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          cd cc65
-          PREFIX=${{ github.workspace }}/opt/cc65 make
-          PREFIX=${{ github.workspace }}/opt/cc65 make install
+      - uses: ./.github/actions/cache_cc65
       - name: Build NES Library
         run: |
           mkdir -p build && cd build
@@ -52,47 +28,14 @@ jobs:
   build_nes_example:
     name: NES Example Build
     runs-on: ubuntu-latest
-    env:
-      CC65_VERSION: 2.19
-      CC65_REF: 18ae09f6821b3ed15121220100023b70ae393e30
-      CC65_PATH: ${{ github.workspace }}/opt/cc65
-      FAMISTUDIO_VERSION: 3.2.2
-      FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
-      FAMISTUDIO_PATH: ${{ github.workspace }}/opt/famistudio
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/cache@v2
-        if: ${{ !env.ACT }}
-        id: cache
-        name: Cache Deps
+      - uses: ./.github/actions/cache_cc65
+      - uses: ./.github/actions/cache_famistudio
         with:
-          path: ${{ github.workspace }}/opt
-          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-cc65${{ env.CC65_VERSION }}-${{ env.CC65_REF }}-fami${{ env.FAMISTUDIO_VERSION }}
-      - name: Checkout cc65
-        uses: actions/checkout@v2
-        if: steps.cache.outputs.cache-hit != 'true'
-        with:
-          repository: cc65/cc65
-          ref: ${{ env.CC65_REF }}
-          path: './cc65'
-      - name: Build CC65
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          cd cc65
-          PREFIX=${{ github.workspace }}/opt/cc65 make
-          PREFIX=${{ github.workspace }}/opt/cc65 make install
-      - name: Install Famistudio
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p ${{ github.workspace }}/opt/famistudio
-          wget https://github.com/BleuBleu/FamiStudio/releases/download/${{ env.FAMISTUDIO_BIN }} -O famistudio.zip
-          unzip famistudio.zip -d ${{ github.workspace }}/opt/famistudio
-      - name: Install gtk-sharp2
-        run: |
-          sudo apt-get install gtk-sharp2
+          fsBin: ${{ env.FAMISTUDIO_BIN }}
       - name: Build NES Example
         run: |
-          cd example
-          mkdir -p build && cd build
+          mkdir -p example/build && cd example/build
           cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH="${{ env.CC65_PATH }}" -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
           make
