@@ -80,8 +80,34 @@ def export_engine(fin, fout, famistudio_path=None):
     "-famistudio-generate-list", famistudio_path=famistudio_path)
 
 def bin2h(fin):
-  done = subprocess.run([str(shutil.which("bin2header")), str(fin)], stderr=subprocess.STDOUT, stdout=subprocess.PIPE, text=True)
-  return done.stdout
+  '''Generates a C header file from a binary file.'''
+  fin = pathlib.Path(fin).resolve()
+  var_name = fin.name.replace(".", "_").replace(" ", "_")
+  fout = fin.with_suffix(fin.suffix+'.h')
+  with open(fin, 'rb') as input:
+    with open(fout, 'w') as output:
+      data_len = 0
+      output.write(f'''
+// Generated from {fin.name} by bin2header (python impl)
+unsigned char {var_name}[] = {{
+''')
+      # writes the previous line ending after the next line is read
+      # so we don't end up with a trailing comma
+      write_line_ending = False
+      while True:
+        data = input.read(1024 * 1024)
+        if not data:
+          break
+        data_len += len(data)
+        lines = [data[i:i+16] for i in range(0, len(data), 16)]
+        for line in lines:
+          if write_line_ending:
+            output.write(f',\n')
+          line = ','.join([f"0x{byte:02x}" for byte in line])
+          output.write(f'{line}')
+          write_line_ending = True
+      output.write(f'}};\n')
+      output.write('unsigned int {var_name}_len = {data_len};'.format(var_name=var_name, data_len=len(data)))
 
 def export_ogg(fin, fout, famistudio_path=None):
   fin = pathlib.Path(fin).resolve()
@@ -100,34 +126,39 @@ def generate_pc(fin, fout, famistudio_path=None):
   song_list_len = []
   for i, file in enumerate(fin.rglob('*.fms')):
     song = file.stem
-    print("Exporting PC audio tracks (ogg) and converting them to headers")
+    print(f"Exporting PC audio track {file.stem} and converting to C header")
     export_ogg(file, fout, famistudio_path)
-    print(bin2h(f"{fout}/{song}.ogg"))
+    bin2h(f"{fout}/{song}.ogg")
     include += [f'#include "./{song}.ogg.h"']
     song_list += [f'{song}_ogg']
     song_list_len += [f'sizeof({song}_ogg)']
     define += ['#define ' + f'SONG_{song} {i}'.upper()]
-  
-  with open(f"{fout}/internal.c", 'w') as f:
+  include = '\n'.join(include)
+  song_len = len(song_list)
+  song_list = ',\n'.join(song_list)
+  song_list_len = ',\n'.join(song_list_len)
+  with open(f"{fout}/cnes_pc_audio_gen_internal.c", 'w') as f:
     f.write(f'''
-{os.linesep.join(include)}
+{include}
 
-const unsigned int cnes_song_list_len = {len(song_list)};
+const unsigned int cnes_song_list_len = {song_len};
 
 const unsigned char* cnes_song_list[] = {{
-  {(',' + os.linesep).join(song_list)}
+  {song_list}
 }};
 
 const unsigned int cnes_song_len[] = {{
-  {(',' + os.linesep).join(song_list_len)}
+  {song_list_len}
 }};
 ''')
-  with open(f"{fout}/internal.h", 'w') as f:
+
+  define = '\n'.join(define)
+  with open(f"{fout}/cnes_pc_audio_gen_internal.h", 'w') as f:
     f.write(f'''
 #ifndef __CNES_PC_AUDIO_H
 #define __CNES_PC_AUDIO_H
 
-{os.linesep.join(define)}
+{define}
 
 #endif //__CNES_PC_AUDIO_H
 ''') 
@@ -222,20 +253,21 @@ SFXAddrLo:   .byte {song_data['sfxlo']}"""
     template = file.read()
   with open(f"{file_path}/famistudio_ca65.s", 'r') as file:
     engine = file.read()
-  template = template.replace("{famistudio_segment_code}", os.linesep.join(segments))
+  template = template.replace("{famistudio_segment_code}", '\n'.join(segments))
   template = template.replace("{famistudio_music_list}", song_data_template)
-  template = template.replace("{famistudio_config_options}", os.linesep.join(config))
+  template = template.replace("{famistudio_config_options}", '\n'.join(config))
   template = template.replace("{famistudio_engine_code}", engine)
 
-  with open(f"{fout}/engine_build.s", 'w') as file:
+  with open(f"{fout}/cnes_nes_audio_gen_internal.s", 'w') as file:
     file.write(template)
 
-  with open(f"{fout}/internal.h", 'w') as f:
+  define = '\n'.join(define)
+  with open(f"{fout}/cnes_nes_audio_gen_internal.h", 'w') as f:
     f.write(f'''
 #ifndef __CNES_NES_AUDIO_H
 #define __CNES_NES_AUDIO_H
 
-{os.linesep.join(define)}
+{define}
 
 #endif //__CNES_NES_AUDIO_H
 ''') 
@@ -282,9 +314,9 @@ def main():
 #ifndef CNES_AUDIO_GEN_H
 #define CNES_AUDIO_GEN_H
 #ifdef __NES__
-#include "../nes/audio/internal.h"
+#include "../nes/audio/cnes_nes_audio_gen_internal.h"
 #else
-#include "../pc/audio/internal.h"
+#include "../pc/audio/cnes_pc_audio_gen_internal.h"
 #endif //__NES__
 #endif //CNES_AUDIO_GEN_H
 ''')
