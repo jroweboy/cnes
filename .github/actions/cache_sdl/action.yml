@@ -8,6 +8,6 @@ run:
       id: cache_sdl
       with:
         path: |
-          ${{ github.workspace }}/build/_deps
-          ${{ github.workspace }}/example/build/_deps
-        key: ${{ runner.os }}-sdl${{ hashFiles('cmake/buildSDL2.cmake') }}
+          ${{ env.GITHUB_WORKSPACE }}/build/_deps
+          ${{ env.GITHUB_WORKSPACE }}/example/build/_deps
+        key: ${{ env.MATRIX_OS }}-sdl${{ hashFiles('cmake/buildSDL2.cmake') }}
