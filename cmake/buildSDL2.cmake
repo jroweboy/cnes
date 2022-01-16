@@ -46,4 +46,11 @@ if (NOT sdl2mixer_POPULATED)
   set(MESSAGE_QUIET OFF)
   add_subdirectory(${sdl2mixer_SOURCE_DIR} ${sdl2mixer_BINARY_DIR})
   unset(MESSAGE_QUIET)
+
+  # hacky way to remove shared libaries from the final linker command.
+  get_target_property(EXE_LINKED_LIBS SDL2_mixer LINK_LIBRARIES)
+  list(FILTER EXE_LINKED_LIBS EXCLUDE REGEX "SDL2::SDL2")
+  list(APPEND EXE_LINKED_LIBS SDL2-static)
+  set_property(TARGET SDL2_mixer PROPERTY LINK_LIBRARIES ${EXE_LINKED_LIBS})
+
 endif ()
