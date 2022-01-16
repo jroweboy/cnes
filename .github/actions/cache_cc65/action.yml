@@ -31,3 +31,4 @@ runs:
           cd cc65
           PREFIX=${{ inputs.cc65Path }}/opt/cc65 make
           PREFIX=${{ inputs.cc65Path }}/opt/cc65 make install
+        shell: bash
