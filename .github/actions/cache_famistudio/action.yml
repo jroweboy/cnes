@@ -33,16 +33,17 @@ runs:
         unzip famistudio.zip -d ${{ github.workspace }}/opt/famistudio
       shell: bash
     # Cache GTK2-Sharp (Linux)
-    - uses: actions/cache@v2
+    - if: runner.os == 'Linux'
+      uses: actions/cache@v2
       id: cache_gtk
       with:
         path: ${{ github.workspace }}/opt/gtk-sharp2
         key: ${{ runner.os }}-gtk${{ inputs.gtkVersion }}-action-${{ hashFiles('.github/actions/cache_famistudio/*') }}
     # Install GTK2-Sharp (Linux)
-    - env:
+    - if: runner.os == 'Linux'
+      env:
         CACHE_HIT: ${{steps.cache_gtk.outputs.cache-hit}}
       run: |
-        echo "matrix.os: $MATRIX_OS"
         if [[ "$CACHE_HIT" == 'true' ]]; then
           sudo cp -rf ${{ github.workspace }}/opt/gtk-sharp2/* /
         else
