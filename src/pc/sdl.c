@@ -1,5 +1,4 @@
 
-
 #include "cnes.h"
 #include "cnes_internal.h"
 #include <SDL.h>
