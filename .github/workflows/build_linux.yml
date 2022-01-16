@@ -28,7 +28,7 @@ jobs:
             ${{ github.workspace }}/opt
             ${{ github.workspace }}/build/_deps
             ${{ github.workspace }}/example/build/_deps
-          key: ${{ runner.os }}-${{ env.cache-name }}-fami${{ env.FAMISTUDIO_VERSION }}-sdl${{ hashfiles(cmake/buildSDL2.cmake) }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-fami${{ env.FAMISTUDIO_VERSION }}-sdl${{ hashFiles('cmake/buildSDL2.cmake') }}
       - name: Build PC Library
         run: |
           mkdir -p build && cd build
@@ -49,7 +49,7 @@ jobs:
             ${{ github.workspace }}/opt
             ${{ github.workspace }}/build/_deps
             ${{ github.workspace }}/example/build/_deps
-          key: ${{ runner.os }}-${{ env.cache-name }}-fami${{ env.FAMISTUDIO_VERSION }}-sdl${{ hashfiles(cmake/buildSDL2.cmake) }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-fami${{ env.FAMISTUDIO_VERSION }}-sdl${{ hashFiles('cmake/buildSDL2.cmake') }}
       - name: Install Famistudio
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
