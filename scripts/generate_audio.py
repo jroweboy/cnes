@@ -27,6 +27,7 @@ def fm(*args, famistudio_path=None):
       xvfb = str(shutil.which("xvfb-run"))
       cmd = [xvfb, '--auto-servernum'] + cmd
   done = subprocess.run(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, text=True)
+  print(f"FamiStudio CMD ({' '.join(cmd)}) output:\n{done}")
   return done.stdout
 
 def export_engine(fin, fout, famistudio_path=None):

@@ -24,7 +24,7 @@ runs:
       id: cache_famistudio
       with:
         path: ${{ github.workspace }}/opt/famistudio
-        key: ${{ runner.os }}-fami${{ inputs.fsVersion }}
+        key: ${{ runner.os }}-fami${{ inputs.fsVersion }}-action-${{ hashFiles('.github/actions/cache_famistudio/*') }}
     # Download Famistudio
     - if: steps.cache_famistudio.outputs.cache-hit != 'true'
       run: |
@@ -38,7 +38,7 @@ runs:
       id: cache_gtk
       with:
         path: ${{ github.workspace }}/opt/gtk-sharp2
-        key: ${{ runner.os }}-gtk${{ inputs.gtkVersion }}
+        key: ${{ runner.os }}-gtk${{ inputs.gtkVersion }}-action-${{ hashFiles('.github/actions/cache_famistudio/*') }}
     # Install GTK2-Sharp (Linux)
     - if: matrix.os == 'ubuntu-latest'
       env:

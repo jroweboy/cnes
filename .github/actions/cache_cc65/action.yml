@@ -17,7 +17,7 @@ runs:
         id: cache_cc65
         with:
           path: ${{ inputs.cc65Path }}
-          key: ${{ runner.os }}-cc65-${{ inputs.cc65Ref }}
+          key: ${{ runner.os }}-cc65-${{ inputs.cc65Ref }}-${{ hashFiles('.github/actions/cache_cc65/*') }}
       # Checkout CC65
       - uses: actions/checkout@v2
         if: steps.cache_cc65.outputs.cache-hit != 'true'
@@ -29,6 +29,6 @@ runs:
       - if: steps.cache_cc65.outputs.cache-hit != 'true'
         run: |
           cd cc65
-          PREFIX=${{ inputs.cc65Path }}/opt/cc65 make
-          PREFIX=${{ inputs.cc65Path }}/opt/cc65 make install
+          PREFIX=${{ inputs.cc65Path }} make
+          PREFIX=${{ inputs.cc65Path }} make install
         shell: bash

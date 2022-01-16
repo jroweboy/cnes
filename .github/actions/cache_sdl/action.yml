@@ -10,4 +10,4 @@ runs:
         path: |
           ${{ github.workspace }}/build/_deps
           ${{ github.workspace }}/example/build/_deps
-        key: ${{ runner.os }}-sdl${{ hashFiles('cmake/buildSDL2.cmake') }}
+        key: ${{ runner.os }}-sdl-${{ hashFiles('cmake/buildSDL2.cmake') }}-action-${{ hashFiles('.github/actions/cache_sdl/*') }}
