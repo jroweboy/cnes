@@ -16,7 +16,6 @@ import inspect
 
 def fm(*args, famistudio_path=None):
   # Default location for now is ../tools/famistudio/Famistudio
-  print(f"{inspect.getframeinfo(inspect.currentframe())}")
   if not famistudio_path:
     file_path = os.path.abspath(os.path.dirname(__file__))
     famistudio_path = f"{file_path}/../tools/famistudio/Famistudio"
@@ -27,12 +26,10 @@ def fm(*args, famistudio_path=None):
     if 'CI' in os.environ:
       xvfb = str(shutil.which("xvfb-run"))
       cmd = [xvfb, '--auto-servernum'] + cmd
-  print(f"{inspect.getframeinfo(inspect.currentframe())}")
   done = subprocess.run(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, text=True)
   return done.stdout
 
 def export_engine(fin, fout, famistudio_path=None):
-  print(f"{inspect.getframeinfo(inspect.currentframe())}")
   fin = pathlib.Path(fin).resolve()
   fout = pathlib.Path(fout).resolve()
   project_name = fin.stem
@@ -54,7 +51,7 @@ def export_engine(fin, fout, famistudio_path=None):
         sfx_indicies += [line[line.rfind(" ")+1:]]
       elif line.startswith('song_'):
         song_indicies += [line[line.rfind(" ")+1:]]
-  print(f"{inspect.getframeinfo(inspect.currentframe())}")
+
   os.remove(f"{fout}/all_project_songlist.inc")
   os.remove(f"{fout}/all_project.dmc")
   os.remove(f"{fout}/all_project.s")
@@ -87,7 +84,6 @@ def export_engine(fin, fout, famistudio_path=None):
 
 def bin2h(fin):
   '''Generates a C header file from a binary file.'''
-  print(f"{inspect.getframeinfo(inspect.currentframe())}")
   fin = pathlib.Path(fin).resolve()
   var_name = fin.name.replace(".", "_").replace(" ", "_")
   fout = fin.with_suffix(fin.suffix+'.h')
@@ -114,7 +110,7 @@ unsigned char {var_name}[] = {{
           output.write(f'{line}')
           write_line_ending = True
       output.write(f'}};\n')
-      output.write('unsigned int {var_name}_len = {data_len};'.format(var_name=var_name, data_len=len(data)))
+      output.write(f"unsigned int {var_name}_len = {data_len};\n")
 
 def export_ogg(fin, fout, famistudio_path=None):
   fin = pathlib.Path(fin).resolve()
@@ -126,14 +122,12 @@ def export_ogg(fin, fout, famistudio_path=None):
 def generate_pc(fin, fout, famistudio_path=None):
   fin = pathlib.Path(fin).resolve()
   fout = pathlib.Path(f"{fout}/pc/audio/").resolve()
-  print(f"{inspect.getframeinfo(inspect.currentframe())}")
   
   define = []
   include = []
   song_list = []
   song_list_len = []
   for i, file in enumerate(fin.rglob('*.fms')):
-    print(f"{inspect.getframeinfo(inspect.currentframe())}")
     song = file.stem
     print(f"Exporting PC audio track {file.stem} and converting to C header")
     export_ogg(file, fout, famistudio_path)
@@ -182,10 +176,9 @@ def generate_engine(fin, fout, famistudio_path=None):
   file_path = os.path.abspath(os.path.dirname(__file__))
   config = set()
   segments = set()
-  print(f"{inspect.getframeinfo(inspect.currentframe())}")
+
   for file in fin.rglob('*.fms'):
     project_name = file.stem
-    print(f"{inspect.getframeinfo(inspect.currentframe())}")
     cmd_output = export_engine(str(file), fout, famistudio_path)
     if not cmd_output:
       continue
@@ -215,7 +208,6 @@ def generate_engine(fin, fout, famistudio_path=None):
     raise Exception("Unable to load any audio files")
 
   # Load the generated include files to get the name of the exported songs
-  print(f"{inspect.getframeinfo(inspect.currentframe())}")
   song_data = []
   songs = []
   define = []
@@ -245,7 +237,7 @@ def generate_engine(fin, fout, famistudio_path=None):
         "sfxhi": ", ".join([a['sfxhi'],b['sfxhi']]),
         "sfxlo": ", ".join([a['sfxlo'],b['sfxlo']]),
       }, song_data)
-  
+
   song_data_template = f"""
 .export MusicBank_A, MusicBank_C, MusicAddrHi, MusicAddrLo, SFXAddrHi, SFXAddrLo
 MusicBank_A: .byte {song_data['banka']}
@@ -270,7 +262,6 @@ SFXAddrLo:   .byte {song_data['sfxlo']}"""
   template = template.replace("{famistudio_config_options}", '\n'.join(config))
   template = template.replace("{famistudio_engine_code}", engine)
 
-  print(f"{inspect.getframeinfo(inspect.currentframe())}")
   with open(f"{fout}/cnes_nes_audio_gen_internal.s", 'w') as file:
     file.write(template)
   print()

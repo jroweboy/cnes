@@ -14,7 +14,8 @@ env:
   FAMISTUDIO_VERSION: 3.2.2
   FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
   FAMISTUDIO_PATH: ${{ github.workspace }}/opt/famistudio
-  CACHE_NAME: DEPENDS
+  # Change this if you need to cache bust for whatever reason
+  CACHE_NAME: deps
 
 jobs:
   build_nes_lib:
@@ -28,7 +29,7 @@ jobs:
         name: Cache Deps
         with:
           path: ${{ github.workspace }}/opt
-          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-cc65${{ env.CC65_VERSION }}-${{ env.CC65_REF }}-fami${{ env.FAMISTUDIO_VERSION }}
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-cc65${{ env.CC65_VERSION }}-${{ env.CC65_REF }}
       - name: Checkout cc65
         uses: actions/checkout@v2
         if: steps.cache.outputs.cache-hit != 'true'

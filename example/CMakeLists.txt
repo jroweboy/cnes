@@ -75,6 +75,7 @@ else()
   set(audio_gen ${gen}/inc/cnes_audio_gen.h)
   if (NES)
     list(APPEND audio_gen
+      ${gen}/${BUILD_TYPE}/audio/cnes_nes_audio_gen_internal.h
       ${gen}/${BUILD_TYPE}/audio/cnes_nes_audio_gen_internal.s
     )
   else()
