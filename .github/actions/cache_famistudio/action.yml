@@ -34,13 +34,13 @@ runs:
       shell: bash
     # Cache GTK2-Sharp (Linux)
     - uses: actions/cache@v2
-      if: matrix.os == 'ubuntu-latest'
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       id: cache_gtk
       with:
         path: ${{ github.workspace }}/opt/gtk-sharp2
         key: ${{ runner.os }}-gtk${{ inputs.gtkVersion }}-action-${{ hashFiles('.github/actions/cache_famistudio/*') }}
     # Install GTK2-Sharp (Linux)
-    - if: matrix.os == 'ubuntu-latest'
+    - if: ${{ matrix.os == 'ubuntu-latest' }}
       env:
         CACHE_HIT: ${{steps.cache_gtk.outputs.cache-hit}}
       run: |
