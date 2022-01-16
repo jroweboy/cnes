@@ -16,7 +16,7 @@ inputs:
     description: "GTK Version (Linux Only)"
     required: false
     default: "2.12.40-2"
-run:
+runs:
   using: "composite"
   steps:
     # Cache Famistudio

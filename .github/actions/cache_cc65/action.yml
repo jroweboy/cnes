@@ -9,8 +9,7 @@ inputs:
     description: "CC65 path to cache"
     required: false
     default: ${{ github.workspace }}/opt/cc65
-  
-run:
+runs:
   using: "composite"
   steps:
       # Cache CC65
