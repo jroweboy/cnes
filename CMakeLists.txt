@@ -50,6 +50,7 @@ if (NOT NES)
   # PC dependencies
   include(FetchContent)
 
+  # Turn off BUILD_SHARED_LIBS to convince SDL_mixer to build static
   set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
   FetchContent_Declare(
@@ -62,6 +63,8 @@ if (NOT NES)
   if (NOT sdl2_POPULATED)
     FetchContent_Populate(SDL2)
     set(SDL_STATIC_PIC ON CACHE BOOL "" FORCE)
+    # Turn ON SDL_SHARED so when SDL_Mixer can target it
+    # (it looks for the shared target only right now)
     set(SDL_SHARED ON CACHE BOOL "" FORCE)
     set(MESSAGE_QUIET OFF)
     add_subdirectory(${sdl2_SOURCE_DIR} ${sdl2_BINARY_DIR})

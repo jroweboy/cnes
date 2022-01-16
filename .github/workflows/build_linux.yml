@@ -34,7 +34,7 @@ jobs:
         run: |
           mkdir -p build && cd build
           cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
-          make
+          make VERBOSE=1
 
   build_linux_example:
     name: Linux Example Build
@@ -65,4 +65,4 @@ jobs:
           cd example
           mkdir -p build && cd build
           cmake -G "Unix Makefiles" -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
-          make
+          make VERBOSE=1
