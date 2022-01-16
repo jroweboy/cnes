@@ -1,14 +1,19 @@
 name: Cache FamiStudio
+description: Caches FamiStudio and runtime deps (and installs if missing)
 inputs:
   fsBin:
+    description: "URL path to download FamiStudio Binary from"
     required: true
   fsVersion:
+    description: "FS Version (used as cache key)"
     required: false
     default: "3.2.2"
   fsPath:
+    description: "Path to install FS to"
     required: false
     default: ${{ github.workspace }}/opt/famistudio
   gtkVersion:
+    description: "GTK Version (Linux Only)"
     required: false
     default: "2.12.40-2"
 run:

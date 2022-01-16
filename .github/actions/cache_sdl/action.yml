@@ -1,4 +1,5 @@
 name: Cache SDL
+description: Caches SDL2 from the build output directories
 run:
   using: "composite"
   steps:

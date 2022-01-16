@@ -1,9 +1,12 @@
 name: Cache CC65
+description: Caches CC65 and builds it from source if missing
 inputs:
   cc65Ref:
+    description: "CC65 Git Ref (used to checkout a fixed version)"
     required: false
     default: "18ae09f6821b3ed15121220100023b70ae393e30"
   cc65Path:
+    description: "CC65 path to cache"
     required: false
     default: ${{ github.workspace }}/opt/cc65
   
