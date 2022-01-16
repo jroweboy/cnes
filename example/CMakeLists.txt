@@ -56,7 +56,6 @@ if (NES)
     src/nes.cfg
     src/nesheader.c
   )
-  list(APPEND audio_gen ${gen}/nes/audio/engine_build.s)
 else()
   set(BUILD_TYPE pc)
   set(exe ${CMAKE_PROJECT_NAME})
@@ -76,12 +75,12 @@ else()
   set(audio_gen ${gen}/inc/cnes_audio_gen.h)
   if (NES)
     list(APPEND audio_gen
-      ${gen}/${BUILD_TYPE}/audio/engine_build.s
+      ${gen}/${BUILD_TYPE}/audio/cnes_nes_audio_gen_internal.s
     )
   else()
     list(APPEND audio_gen 
-      ${gen}/pc/audio/internal.h
-      ${gen}/pc/audio/internal.c
+      ${gen}/pc/audio/cnes_pc_audio_gen_internal.h
+      ${gen}/pc/audio/cnes_pc_audio_gen_internal.c
     )
   endif()
 

@@ -40,53 +40,10 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "6502")
   set(NES ON CACHE BOOL "" FORCE)
 endif()
 
-function(message)
-    if (NOT MESSAGE_QUIET)
-        _message(${ARGN})
-    endif()
-endfunction()
-
 if (NOT NES)
-  # PC dependencies
-  include(FetchContent)
-
-  # Turn off BUILD_SHARED_LIBS to convince SDL_mixer to build static
-  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-
-  FetchContent_Declare(
-    SDL2
-    GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
-    GIT_TAG release-2.0.20
-  )
-
-  FetchContent_GetProperties(SDL2)
-  if (NOT sdl2_POPULATED)
-    FetchContent_Populate(SDL2)
-    set(SDL_STATIC_PIC ON CACHE BOOL "" FORCE)
-    # Turn ON SDL_SHARED so when SDL_Mixer can target it
-    # (it looks for the shared target only right now)
-    set(SDL_SHARED ON CACHE BOOL "" FORCE)
-    set(MESSAGE_QUIET OFF)
-    add_subdirectory(${sdl2_SOURCE_DIR} ${sdl2_BINARY_DIR})
-    unset(MESSAGE_QUIET)
-  endif ()
-
-  FetchContent_Declare(
-    SDL2Mixer
-    GIT_REPOSITORY "https://github.com/libsdl-org/SDL_mixer.git"
-    GIT_TAG master
-  )
-
-  FetchContent_GetProperties(SDL2Mixer)
-
-  if (NOT sdl2mixer_POPULATED)
-    FetchContent_Populate(SDL2Mixer)
-    set(SUPPORT_OGG ON CACHE BOOL "" FORCE)
-    set(MESSAGE_QUIET OFF)
-    add_subdirectory(${sdl2mixer_SOURCE_DIR} ${sdl2mixer_BINARY_DIR})
-    unset(MESSAGE_QUIET)
-  endif ()
-  
+  # fetch SDL2 dependency and build it.
+  get_filename_component(CNES_BUILD_SDL_FILE ${PROJECT_SOURCE_DIR}/cmake/buildSDL2.cmake ABSOLUTE)
+  include(${CNES_BUILD_SDL_FILE})
 endif()
 
 set(CNES_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/inc)

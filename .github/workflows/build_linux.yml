@@ -8,7 +8,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SDL_REF: release-2.0.20 # Note: This is hardcoded in cnes/CMakeLists.txt
   FAMISTUDIO_VERSION: 3.2.2
   FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
   FAMISTUDIO_PATH: ${{ github.workspace }}/opt/famistudio
@@ -29,7 +28,7 @@ jobs:
             ${{ github.workspace }}/opt
             ${{ github.workspace }}/build/_deps
             ${{ github.workspace }}/example/build/_deps
-          key: ${{ runner.os }}-${{ env.cache-name }}-fami${{ env.FAMISTUDIO_VERSION }}-sdl${{ env.SDL_REF }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-fami${{ env.FAMISTUDIO_VERSION }}-sdl${{ hashfiles(cmake/buildSDL2.cmake) }}
       - name: Build PC Library
         run: |
           mkdir -p build && cd build
@@ -50,7 +49,7 @@ jobs:
             ${{ github.workspace }}/opt
             ${{ github.workspace }}/build/_deps
             ${{ github.workspace }}/example/build/_deps
-          key: ${{ runner.os }}-${{ env.cache-name }}-fami${{ env.FAMISTUDIO_VERSION }}-sdl${{ env.SDL_REF }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-fami${{ env.FAMISTUDIO_VERSION }}-sdl${{ hashfiles(cmake/buildSDL2.cmake) }}
       - name: Install Famistudio
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
