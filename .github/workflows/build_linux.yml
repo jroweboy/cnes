@@ -11,7 +11,8 @@ env:
   FAMISTUDIO_VERSION: 3.2.2
   FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
   FAMISTUDIO_PATH: ${{ github.workspace }}/opt/famistudio
-  CACHE_NAME: DEPENDS
+  # Change this if you need to cache bust for whatever reason
+  CACHE_NAME: deps
 
 jobs:
   build_linux_lib:
@@ -28,7 +29,7 @@ jobs:
             ${{ github.workspace }}/opt
             ${{ github.workspace }}/build/_deps
             ${{ github.workspace }}/example/build/_deps
-          key: ${{ runner.os }}-${{ env.cache-name }}-fami${{ env.FAMISTUDIO_VERSION }}-sdl${{ hashFiles('cmake/buildSDL2.cmake') }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-sdl${{ hashFiles('cmake/buildSDL2.cmake') }}
       - name: Build PC Library
         run: |
           mkdir -p build && cd build
