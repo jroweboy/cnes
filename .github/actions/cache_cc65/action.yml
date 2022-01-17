@@ -4,7 +4,7 @@ inputs:
   cc65Ref:
     description: "CC65 Git Ref (used to checkout a fixed version)"
     required: false
-    default: "18ae09f6821b3ed15121220100023b70ae393e30"
+    default: "6ac4aa4e2076189ad5b5f3a9d33e1c5910d4e37c"
   cc65Path:
     description: "CC65 path to cache"
     required: false
