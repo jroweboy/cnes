@@ -3,26 +3,30 @@
 #define CNES_H
 
 #include "common_types.h"
-#include "cnes_defaults.h"
 
-#if CNES_JOYPAD
+/**
+ * @brief Engine provides callbacks for NMI and IRQs and runs the main application loop.
+ */
+#ifdef CNES_ENGINE
+#include "engine.h"
+#endif //CNES_ENGINE
+
+/**
+ * @brief Joypad sets up RAM for pooling joypads and drives updating joypad state
+ */
+#ifdef CNES_JOYPAD
 #include "joypad.h"
-#endif
+#endif //CNES_JOYPAD
 
 /// Provides high level drawing functionality
-#if CNES_DRAWING
+#ifdef CNES_DRAWING
 #include "drawing.h"
-#endif
+#endif //CNES_DRAWING
 
-/// Engine provides callbacks for NMI and IRQs.
-#if CNES_ENGINE
-#include "engine.h"
-#endif
-
-/// Engine provides callbacks for NMI and IRQs.
-#if CNES_AUDIO
+/// Engine provides audio through famistudio.
+#ifdef CNES_AUDIO
 #include "audio.h"
-#endif
+#endif //CNES_AUDIO
 
 /// Driver code (handles game initialization)
 

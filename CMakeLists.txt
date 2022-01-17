@@ -40,8 +40,15 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "6502")
   set(NES ON CACHE BOOL "" FORCE)
 endif()
 
-if (NOT NES)
 
+include(CMakeDependentOption)
+option(CNES_ENGINE "Enable CNES IRQ/NMI engine" ON)
+option(CNES_AUDIO "Enable CNES audio engine (using famistudio)" ON)
+option(CNES_JOYPAD "Enable CNES Joypad support" ON)
+cmake_dependent_option(CNES_JOYPAD_HELD "Enable button held checking. (Adds 8 bytes of RAM per player)" ON CNES_JOYPAD OFF)
+cmake_dependent_option(CNES_JOYPAD_PLAYER2 "Enable polling for player 2. (Adds 4-12 bytes of RAM)" ON CNES_JOYPAD OFF)
+
+if (NOT NES)
   # Turn off BUILD_SHARED_LIBS to convince SDL_mixer to build static
   set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 

@@ -13,6 +13,10 @@ if (NES)
     nes/joypad.s
     nes/nes.c
   )
+  # 
+  target_compile_options(
+
+  )
 else()
   add_library(${module} STATIC
     pc/audio.c

@@ -61,20 +61,6 @@ wait_for_nmi:   .res 1
   ; rts
 .endproc
 
-.export GameLoop
-.proc GameLoop
-  lda late_frame
-  jsr _runframe
-  lda #1
-  sta wait_for_nmi
-  :
-    ldx next_frame
-  beq :-
-  lda #0
-  sta next_frame
-  jmp GameLoop
-.endproc
-
 SCANLINE_NMI           = 0
 
 .import UpdateMusic

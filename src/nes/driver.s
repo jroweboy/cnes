@@ -70,3 +70,16 @@
   ; endless loop
 .endproc
 
+.proc GameLoop
+  ; TODO check late frame
+  lda late_frame
+  jsr _runframe
+  lda #1
+  sta wait_for_nmi
+  :
+    ldx next_frame
+  beq :-
+  lda #0
+  sta next_frame
+  jmp GameLoop
+.endproc
