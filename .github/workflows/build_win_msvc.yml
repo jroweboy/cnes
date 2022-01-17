@@ -1,0 +1,40 @@
+
+name: Windows MSVC
+
+on: [pull_request, push]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FAMISTUDIO_BIN: 3.2.2/FamiStudio322-WinPortableExe.zip
+  FAMISTUDIO_PATH: ${{ github.workspace }}/opt/famistudio
+
+jobs:
+  build_msvc_lib:
+    name: MSVC Library Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Build PC Library
+        run: |
+          mkdir -p build && cd build
+          cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
+          nmake
+
+  build_msvc_example:
+    name: Linux Example Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/cache_famistudio
+        with:
+          fsBin: ${{ env.FAMISTUDIO_BIN }}
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Build Win MSVC example
+        run: |
+          mkdir -p example/build && cd example/build
+          cmake -G "NMake Makefiles" -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
+          nmake

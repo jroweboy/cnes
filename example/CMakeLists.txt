@@ -1,10 +1,12 @@
 
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 project(cnes_example LANGUAGES C ASM)
 
 if (NOT CNES_BUILD_SINGLE)
   # use external project add to build the application into separate subfolders
+  # this allows cmake to act a a multi target builder from the base folder (very useful)
+  # for testing pc and nes targets at the same time.
   include(ExternalProject)
   get_filename_component(CNES_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/../cmake/cc65-toolchain.cmake ABSOLUTE)
   get_filename_component(CNES_PREFIX_PATH ${CMAKE_SOURCE_DIR}/../tools/cc65 ABSOLUTE)
@@ -42,8 +44,8 @@ endif()
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-# Normally the cnes library is a subdirectory of the project.
-# But we can do a little hacky-workaround to make that work
+# Normally the cnes library is a subdirectory of the user's project.
+# But we can do a little hacky-workaround to make it work as a subdirectory of this one
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CURRENT_BINARY_DIR}/cnes)
 
 set(gen ${CMAKE_BINARY_DIR}/gen)

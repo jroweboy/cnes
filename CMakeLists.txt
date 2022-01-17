@@ -41,9 +41,35 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "6502")
 endif()
 
 if (NOT NES)
+
+  # Turn off BUILD_SHARED_LIBS to convince SDL_mixer to build static
+  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
   # fetch SDL2 dependency and build it.
   get_filename_component(CNES_BUILD_SDL_FILE ${PROJECT_SOURCE_DIR}/cmake/buildSDL2.cmake ABSOLUTE)
   include(${CNES_BUILD_SDL_FILE})
+
+  include(${PROJECT_SOURCE_DIR}/cmake/CPM.cmake)
+  CPMAddPackage(
+    NAME SDL2
+    VERSION 2.0.20
+    GITHUB_REPOSITORY "libsdl-org/SDL"
+    GIT_TAG "release-2.0.20"
+    # Turn OFF SDL_SHARED so it doesn't set the SDL2::SDL2 target.
+    # SDL2Mixer looks for the shared target, so we create an alias
+    # for that to force it to run static instead
+    OPTIONS "SDL_STATIC_PIC ON" "SDL_SHARED OFF" "BUILD_SHARED_LIBS OFF"
+  )
+  
+  # prevent SDL2Mixer from creating its own jank SDL2::SDL2 target
+  # add_library(SDL2::SDL2 ALIAS SDL2-static)
+  CPMAddPackage(
+    NAME SDL2Mixer
+    VERSION 2.0.20
+    GITHUB_REPOSITORY "libsdl-org/SDL_mixer"
+    GIT_TAG "60a82b21bdbf2f4626eebee11600f29cebbe1c49"
+    OPTIONS "SUPPORT_OGG ON"
+  )
 endif()
 
 set(CNES_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/inc)
