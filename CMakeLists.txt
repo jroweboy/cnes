@@ -46,9 +46,6 @@ if (NOT NES)
   set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
   # fetch SDL2 dependency and build it.
-  get_filename_component(CNES_BUILD_SDL_FILE ${PROJECT_SOURCE_DIR}/cmake/buildSDL2.cmake ABSOLUTE)
-  include(${CNES_BUILD_SDL_FILE})
-
   include(${PROJECT_SOURCE_DIR}/cmake/CPM.cmake)
   CPMAddPackage(
     NAME SDL2

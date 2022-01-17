@@ -28,12 +28,12 @@ runs:
     # Download Famistudio
     - if: steps.cache_famistudio.outputs.cache-hit != 'true'
       run: |
-        mkdir -p ${{ github.workspace }}/opt/famistudio
-        wget https://github.com/BleuBleu/FamiStudio/releases/download/${{ inputs.fsBin }} -O famistudio.zip
-        unzip famistudio.zip -d ${{ github.workspace }}/opt/famistudio
-      shell: bash
+        md -Force ${{ github.workspace }}/opt/famistudio
+        Invoke-WebRequest https://github.com/BleuBleu/FamiStudio/releases/download/${{ inputs.fsBin }} -OutFile famistudio.zip
+        Expand-Archive -LiteralPath famistudio.zip -DestinationPath ${{ github.workspace }}/opt/famistudio
+      shell: pwsh
     # Install GTK2-Sharp (Linux)
     - if: runner.os == 'Linux'
       run: |
         sudo apt-get install --yes gtk-sharp2="${{ inputs.gtkVersion }}"
-      shell: bash
+      shell: pwsh
