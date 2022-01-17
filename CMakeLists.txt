@@ -54,7 +54,9 @@ if (NOT NES)
     GIT_TAG "release-2.0.20"
     OPTIONS "SDL_STATIC_PIC ON" "SDL_SHARED OFF"
   )
-  
+  if(NOT TARGET SDL2::SDL2)
+    add_library(SDL2::SDL2 ALIAS SDL2-static)
+  endif()
   CPMAddPackage(
     NAME SDL2Mixer
     VERSION 2.0.20

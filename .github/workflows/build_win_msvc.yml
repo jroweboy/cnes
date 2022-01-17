@@ -23,9 +23,9 @@ jobs:
       - name: Build PC Library
         run: |
           mkdir -p build && cd build
-          cmake -G "NMake Makefiles" \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-            -DCNES_BUILD_SINGLE=On \
+          cmake -G "NMake Makefiles" `
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DCNES_BUILD_SINGLE=On `
             -DCPM_SOURCE_CACHE="${{ env.CPM_PATH }}" ../
           nmake
 
@@ -42,9 +42,9 @@ jobs:
       - name: Build Win MSVC example
         run: |
           mkdir -p example/build && cd example/build
-          cmake -G "NMake Makefiles" \
-            -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-            -DCNES_BUILD_SINGLE=On \
+          cmake -G "NMake Makefiles" `
+            -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" `
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DCNES_BUILD_SINGLE=On `
             -DCPM_SOURCE_CACHE="${{ env.CPM_PATH }}" ../
           nmake
