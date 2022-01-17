@@ -95,8 +95,11 @@ else()
   )
 endif()
 
+file(GLOB cnes_headers ${cnes_SOURCE_DIR}/inc/*.h)
+
 add_executable(${exe}
   src/main.c
+  ${cnes_headers}
   ${platform_srcs}
   ${audio_gen}
 )

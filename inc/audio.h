@@ -28,7 +28,6 @@ extern volatile u8 music_playing;
 #define CNES_MUSIC_STOP ((u8)254)
 #define music_stop() (music_queue = (CNES_MUSIC_STOP))
 
-
 /**
  * @brief Starts playing sfx based on the sfx number provided.
  * 

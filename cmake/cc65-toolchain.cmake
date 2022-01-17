@@ -15,7 +15,7 @@ set(CMAKE_AR "${_AR}" CACHE FILEPATH "Archiver path override (prevents issues wi
 
 # 
 set(CC65_TARGET_FLAG "-t nes" CACHE STRING "Target flag for CC65")
-set(CC65_DEBUG_FLAG "-g -DDEBUG --asm-define DEBUG" CACHE STRING "Debug flags for CC65")
+set(CC65_DEBUG_FLAG "-g -DDEBUG --asm-define DEBUG -l -m map.txt" CACHE STRING "Debug flags for CC65")
 set(CC65_OPT_MAX_FLAG "-Oisr" CACHE STRING "Max Optimization flags for CC65")
 set(CC65_OPT_MIN_SIZE "-O" CACHE STRING "Optimization flags for Min Size Build CC65")
 

@@ -2,10 +2,25 @@
 #define CNES_DEFAULTS_H
 
 #ifndef CNES_JOYPAD
-// enable joypad code
+
+/**
+ * A simple NES safe joypad interface that has a few helper functions
+ * to track the state of the joypad over time
+ */
 #define CNES_JOYPAD 1
-// undef to use single player joypad code
+
+/**
+ * If you have a single player game, it saves cycles and RAM to
+ * skip processing player2 input
+ */
 #define CNES_JOYPAD_PLAYER2
+
+/**
+ * Held checks uses an additional 8 bytes of RAM for each player 
+ * so it might not be useful if you don't need to know how long
+ * a button has been held for
+ */
+#define CNES_JOYPAD_HELD
 #endif
 
 #ifndef CNES_DRAWING

@@ -8,6 +8,7 @@ struct Joypad {
   u8 current;
   u8 pressed;
   u8 released;
+  u8 held[8];
 };
 
 static struct Joypad player1;
@@ -76,14 +77,51 @@ void joypad_event(SDL_Event event) {
   }
 }
 
+static inline u8 pad_to_held(u8 pad) {
+  switch (pad) {
+    case PAD_A:
+    default:
+      return 0;
+    case PAD_B:
+      return 1;
+    case PAD_SELECT:
+      return 2;
+    case PAD_START:
+      return 3;
+    case PAD_UP:
+      return 4;
+    case PAD_DOWN:
+      return 5;
+    case PAD_LEFT:
+      return 6;
+    case PAD_RIGHT:
+      return 7;
+  }
+}
+
+
 // ====== Public functions ======
 
 void __LIB_CALLSPEC update_joypad() {
-  player1.pressed = (player1.previous ^ player1.current) & player1.current;
-  player1.released = (player1.previous ^ player1.current) & player1.previous;
+  player1.pressed = player1.current && !player1.previous;
+  player1.released = !player1.current && player1.previous;
 
-  player2.pressed = (player2.previous ^ player2.current) & player2.current;
-  player2.released = (player2.previous ^ player2.current) & player2.previous;
+  player2.pressed = player2.current && !player2.previous;
+  player2.released = !player2.current && player2.previous;
+
+  for (int i=0; i<8; ++i) {
+    u8 button = 1<<i;
+    if (player1_current(button)) {
+      ++player1.held[i];
+    } else if (player1_released(button)) {
+      player1.held[i] = 0;
+    }
+    if (player2_current(button)) {
+      ++player2.held[i];
+    } else if (player2_released(button)) {
+      player2.held[i] = 0;
+    }
+  }
 
   player1.previous = player1.current;
   player2.previous = player2.current;
@@ -93,7 +131,7 @@ bool __LIB_CALLSPEC player1_pressed(u8 buttons) {
   return player1.pressed & buttons;
 }
 
-bool __LIB_CALLSPEC player1_held(u8 buttons) {
+bool __LIB_CALLSPEC player1_current(u8 buttons) {
   return player1.current & buttons;
 }
 
@@ -101,3 +139,22 @@ bool __LIB_CALLSPEC player1_released(u8 buttons) {
   return player1.released & buttons;
 }
 
+u8 __LIB_CALLSPEC player1_held(u8 button) {
+  return player1.held[pad_to_held(button)];
+}
+
+bool __LIB_CALLSPEC player2_pressed(u8 buttons) {
+  return player2.pressed & buttons;
+}
+
+bool __LIB_CALLSPEC player2_current(u8 buttons) {
+  return player2.current & buttons;
+}
+
+bool __LIB_CALLSPEC player2_released(u8 buttons) {
+  return player2.released & buttons;
+}
+
+u8 __LIB_CALLSPEC player2_held(u8 button) {
+  return player2.held[pad_to_held(button)];
+}
