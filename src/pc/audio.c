@@ -11,20 +11,20 @@ int audio_init() {
   int initted=Mix_Init(flags);
   if ((initted & flags) != flags) {
     SDL_LogError(LOG_AUDIO, "Mix_Init: Failed to init required ogg support! %s\n", Mix_GetError());
-    return EXIT_FAILURE;
+    return CNES_FAILURE;
   }
 
 
   if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
     SDL_LogError(LOG_AUDIO, "SDL2_mixer could not be initialized!\n"
             "SDL_Error: %s\n", SDL_GetError());
-    return EXIT_FAILURE;
+    return CNES_FAILURE;
   }
 
   songs = malloc(cnes_song_list_len * sizeof(Mix_Music*));
   if (!songs) {
     SDL_LogError(LOG_AUDIO, "Umm malloc?\n");
-    return EXIT_FAILURE;
+    return CNES_FAILURE;
   }
 
   // Now initialize the songs with the provided songs
@@ -33,7 +33,7 @@ int audio_init() {
     songs[i] = Mix_LoadMUS_RW(ops, 1);
   }
 
-  return 0;
+  return CNES_SUCCESS;
 }
 
 void __LIB_CALLSPEC music_start(u8 song) {

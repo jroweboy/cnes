@@ -22,7 +22,7 @@ int joypad_init() {
   if (ret < 0)
   {
     SDL_LogError(LOG_JOYPAD, "SDL could not initialize! SDL Error: %s\n", SDL_GetError());
-    return ret; 
+    return CNES_FAILURE; 
   }
 
   for (int i = 0; i < SDL_NumJoysticks(); ++i) {
@@ -36,7 +36,7 @@ int joypad_init() {
     }
   }
 
-  return 0;
+  return CNES_SUCCESS;
 }
 
 u8 bit_set(u8 value, u8 bitmask) {

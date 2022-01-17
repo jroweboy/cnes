@@ -6,6 +6,9 @@
 
 // Logging defines
 
+#define CNES_FAILURE -1
+#define CNES_SUCCESS 0
+
 #define LOG_DRIVER 0
 #define LOG_AUDIO 1
 #define LOG_RENDER 2

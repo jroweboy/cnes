@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
   renderer_quit();
   SDL_Quit();
 
-  return EXIT_SUCCESS;
+  return CNES_SUCCESS;
 }
 
 void wait_for_frame_end() {
