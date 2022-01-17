@@ -4,6 +4,7 @@
 
 ![NES](https://github.com/jroweboy/cnes/actions/workflows/build_nes.yml/badge.svg)
 ![Linux](https://github.com/jroweboy/cnes/actions/workflows/build_linux.yml/badge.svg)
+![Windows (MSVC)](https://github.com/jroweboy/cnes/actions/workflows/build_win_msvc.yml/badge.svg)
 
 ## What is CNES?
 
