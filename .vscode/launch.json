@@ -5,14 +5,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Current File",
-      "type": "python",
-      "request": "launch",
-      "program": "${file}",
-      "console": "integratedTerminal",
-      "args": ["--famistudio-path=C:/dev/cnes/tools/famistudio/FamiStudio.exe", "C:/dev/cnes/example/assets/audio", "C:/dev/cnes/example/build/pc/gen"]
-    },
-    {
       "name": "g++.exe - Build and debug cmake",
       "type": "cppdbg",
       "request": "launch",
@@ -32,6 +24,14 @@
         }
       ],
       "preLaunchTask": "C/C++: g++.exe cmake build"
+    },
+    {
+      "name": "Python: Current File",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "args": ["--famistudio-path=C:/dev/cnes/tools/famistudio/FamiStudio.exe", "C:/dev/cnes/example/assets/audio", "C:/dev/cnes/example/build/pc/gen"]
     }
   ]
 }

@@ -6,7 +6,7 @@
       "command": "C:/msys64/mingw64/bin/ninja.exe",
       "args": [],
       "options": {
-        "cwd": "${workspaceFolder}/build/pc"
+        "cwd": "${workspaceFolder}/build/"
       },
       "problemMatcher": ["$gcc"],
       "group": {

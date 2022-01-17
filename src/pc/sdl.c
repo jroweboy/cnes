@@ -1,7 +1,7 @@
 
 #include "cnes.h"
 #include "cnes_internal.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 int main(int argc, char *argv[]) {
   SDL_LogInfo(LOG_DRIVER, "hello");

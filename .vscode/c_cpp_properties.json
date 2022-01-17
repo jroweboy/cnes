@@ -3,16 +3,13 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/inc",
+                "${workspaceFolder}/inc/*",
                 "${workspaceFolder}/inc/**/*",
-                "${workspaceFolder}/src",
+                "${workspaceFolder}/src/*",
                 "${workspaceFolder}/src/**/*",
                 "${workspaceFolder}/example/src",
                 "${workspaceFolder}/example/src/**/*",
-                "${workspaceFolder}/example/build/_deps/sdl2-src/include",
-                "${workspaceFolder}/example/build/pc/_deps/sdl2-src/include",
-                "${workspaceFolder}/example/build/_deps/sdl2mixer-src/include",
-                "${workspaceFolder}/example/build/pc/_deps/sdl2mixer-src/include"
+                "${workspaceFolder}/example/build/**/*"
             ],
             "defines": [
                 "_DEBUG",

@@ -1,7 +1,7 @@
 
 #include "cnes.h"
 #include "cnes_internal.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 struct Joypad {
   u8 previous;

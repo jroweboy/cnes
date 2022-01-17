@@ -1,7 +1,7 @@
 
 #include "cnes.h"
 #include "cnes_internal.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 static SDL_Window* win;
 static SDL_Renderer* ren;
