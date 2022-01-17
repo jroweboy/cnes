@@ -3,14 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/inc/*",
-                "${workspaceFolder}/inc/**/*",
-                "${workspaceFolder}/src/*",
-                "${workspaceFolder}/src/**/*",
-                "${workspaceFolder}/build/**/*",
-                "${workspaceFolder}/example/src",
-                "${workspaceFolder}/example/src/**/*",
-                "${workspaceFolder}/example/build/**/*"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/inc"
             ],
             "defines": [
                 "_DEBUG",

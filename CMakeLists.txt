@@ -40,11 +40,11 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "6502")
   set(NES ON CACHE BOOL "" FORCE)
 endif()
 
-
 include(CMakeDependentOption)
 option(CNES_ENGINE "Enable CNES IRQ/NMI engine" ON)
 option(CNES_AUDIO "Enable CNES audio engine (using famistudio)" ON)
 option(CNES_JOYPAD "Enable CNES Joypad support" ON)
+option(CNES_DRAWING "Enable CNES Map support" ON)
 cmake_dependent_option(CNES_JOYPAD_HELD "Enable button held checking. (Adds 8 bytes of RAM per player)" ON CNES_JOYPAD OFF)
 cmake_dependent_option(CNES_JOYPAD_PLAYER2 "Enable polling for player 2. (Adds 4-12 bytes of RAM)" ON CNES_JOYPAD OFF)
 
@@ -76,26 +76,3 @@ endif()
 set(CNES_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/inc)
 
 add_subdirectory(src)
-
-# set(INCLUDE_INSTALL_DIR inc/ CACHE FILEPATH "")
-# set(LIB_INSTALL_DIR lib/ CACHE FILEPATH "")
-# set(SYSCONFIG_INSTALL_DIR etc/cnes/ CACHE FILEPATH "")
-
-# include(CMakePackageConfigHelpers)
-
-# configure_package_config_file(
-#   cmake/CNESConfig.cmake.in
-#   ${CMAKE_CURRENT_BINARY_DIR}/CNESConfig.cmake
-#   INSTALL_DESTINATION ${LIB_INSTALL_DIR}/cnes/cmake
-#   PATH_VARS INCLUDE_INSTALL_DIR SYSCONFIG_INSTALL_DIR
-# )
-# write_basic_package_version_file(
-#   ${CMAKE_CURRENT_BINARY_DIR}/CNESConfigVersion.cmake
-#   VERSION 0.1.0
-#   COMPATIBILITY SameMajorVersion
-# )
-# install(
-#   FILES ${CMAKE_CURRENT_BINARY_DIR}/CNESConfig.cmake
-#   ${CMAKE_CURRENT_BINARY_DIR}/CNESConfigVersion.cmake
-#   DESTINATION ${LIB_INSTALL_DIR}/cnes/cmake
-# )

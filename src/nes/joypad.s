@@ -14,23 +14,23 @@ player1: .res 4
 .export _p1_pressed  = player1 + PRESSED
 .export _p1_released = player1 + RELEASED
 
-.ifdef CNES_JOYPAD_HELD
+.ifndef CNES_DISABLE_JOYPAD_HELD
 p1_held: .res 8
 .export _p1_held     = player1 + HELD
-.endif ;CNES_JOYPAD_HELD
+.endif ;CNES_DISABLE_JOYPAD_HELD
 
-.ifdef CNES_JOYPAD_PLAYER2
+.ifndef CNES_DISABLE_JOYPAD_PLAYER2
 player2: .res 4
 .export _p2_previous = player2 + PREVIOUS
 .export _p2_current  = player2 + CURRENT
 .export _p2_pressed  = player2 + PRESSED
 .export _p2_released = player2 + RELEASED
 
-.ifdef CNES_JOYPAD_HELD
+.ifndef CNES_DISABLE_JOYPAD_HELD
 p2_held: .res 8
 .export _p2_held     = player2 + HELD
-.endif ;CNES_JOYPAD_HELD
-.endif ;CNES_JOYPAD_PLAYER2
+.endif ;CNES_DISABLE_JOYPAD_HELD
+.endif ;CNES_DISABLE_JOYPAD_PLAYER2
 
 .code
 
@@ -74,12 +74,12 @@ Exit:
   ; Scratches A, X, Y
   lda player1 + CURRENT
   sta player1 + PREVIOUS
-.ifdef CNES_JOYPAD_HELD
+.ifndef CNES_DISABLE_JOYPAD_HELD
   ldx #7
   ldy #0
 .endif
 
-.ifdef CNES_JOYPAD_PLAYER2
+.ifndef CNES_DISABLE_JOYPAD_PLAYER2
   lda player2 + CURRENT
   sta player2 + PREVIOUS
 .endif
@@ -96,7 +96,7 @@ Reread:
   ; now figure out which buttons are just pressed and which ones are just released
   MacroJoypadUpdate player1, 0
 
-.ifdef CNES_JOYPAD_PLAYER2
+.ifndef CNES_DISABLE_JOYPAD_PLAYER2
   MacroJoypadUpdate player2, 1
 .endif
   rts
@@ -108,7 +108,7 @@ Reread:
   ; This means that reading from JOYPAD1 will only return the state of the
   ; first button: button A.
   sta JOYPAD1
-.ifdef CNES_JOYPAD_PLAYER2
+.ifndef CNES_DISABLE_JOYPAD_PLAYER2
   sta player2 + CURRENT  ; player 2's buttons double as a ring counter
 .else
   sta player1 + CURRENT
@@ -122,7 +122,7 @@ Loop:
     and #%00000011  ; ignore bits other than controller
     cmp #$01        ; Set carry if and only if nonzero
     rol player1 + CURRENT  ; Carry -> bit 0; bit 7 -> Carry
-.ifdef CNES_JOYPAD_PLAYER2
+.ifndef CNES_DISABLE_JOYPAD_PLAYER2
     lda JOYPAD2
     and #%00000011  ; ignore bits other than controller
     cmp #$01        ; Set carry if and only if nonzero

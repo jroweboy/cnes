@@ -2,11 +2,6 @@
 .include "common.s"
 
 .zeropage
-; Prevents NMI re-entry
-nmi_lock:       .res 1
-; When the NMI fires outside of the wait frame loop, this is set
-late_frame:     .res 1
-.exportzp _late_frame:=late_frame
 
 ; Stores jsr (indirect) pointers for fast callbacks
 screen_jmp_abs: .res 3
@@ -23,11 +18,6 @@ irq_a:          .res 1
 irq_x:          .res 1
 irq_y:          .res 1
 
-
-.segment "OAM"
-oam: .res 256
-.global oam
-
 .bss
 ; Temp variables that should only be accessed in IRQs
 irq_tmp:        .res 1
@@ -35,57 +25,21 @@ irq_tmp2:       .res 1
 .export irq_tmp, irq_tmp2
 
 screen_state:   .res 1
-next_frame:     .res 1
-.export screen_state, next_frame
+.export screen_state
 
 banka:          .res 1
 bankc:          .res 1
 .export banka, bankc
 
 irq_scanline:   .res 1
-wait_for_nmi:   .res 1
-.export _wait_for_frame_end=WaitForFrameEnd
-
 .code
 
-; Import user defined functions
-.import _init_callback, _runframe
-
-.import InitMusic
 .export InitEngine
 .proc InitEngine
-  jsr InitMusic
-  lda #1
-  sta nmi_lock
-  jmp _init_callback
-  ; rts
+  rts
 .endproc
 
 SCANLINE_NMI           = 0
-
-.import UpdateMusic
-.export HandleNMI, _driver_nmi:=HandleNMI
-.proc HandleNMI
-  sta irq_a
-  lda PPUSTATUS       ; Clear the NMI flag
-  lda nmi_lock
-  beq EarlyExit
-  ; save registers. A was already saved above
-  stx irq_x
-  sty irq_y
-  ; jsr DrawingNMICallback
-  ; jsr PrepareNextScreen
-  jsr UpdateMusic
-  lda #1
-  sta next_frame
-  sta nmi_lock
-  ; restore registers and return
-  ldy irq_y
-  ldx irq_x
-EarlyExit:
-  lda irq_a
-  rti
-.endproc
 
 .export InitIRQ
 .proc InitIRQ
@@ -143,13 +97,6 @@ IRQ_CALLBACK_TABLE:
   jmp (screen_jmp_ptr)
 
 ScreenStateTable:
-.endproc
-
-.proc WaitForFrameEnd
-  :
-  ldx next_frame
-  bpl :-
-  rts
 .endproc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;

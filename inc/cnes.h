@@ -7,26 +7,26 @@
 /**
  * @brief Engine provides callbacks for NMI and IRQs and runs the main application loop.
  */
-#ifdef CNES_ENGINE
+#ifndef CNES_DISABLE_ENGINE
 #include "engine.h"
 #endif //CNES_ENGINE
 
 /**
  * @brief Joypad sets up RAM for pooling joypads and drives updating joypad state
  */
-#ifdef CNES_JOYPAD
+#ifndef CNES_DISABLE_JOYPAD
 #include "joypad.h"
-#endif //CNES_JOYPAD
+#endif //CNES_DISABLE_JOYPAD
 
 /// Provides high level drawing functionality
-#ifdef CNES_DRAWING
+#ifndef CNES_DISABLE_DRAWING
 #include "drawing.h"
-#endif //CNES_DRAWING
+#endif //CNES_DISABLE_DRAWING
 
 /// Engine provides audio through famistudio.
-#ifdef CNES_AUDIO
+#ifndef CNES_DISABLE_AUDIO
 #include "audio.h"
-#endif //CNES_AUDIO
+#endif //CNES_DISABLE_AUDIO
 
 /// Driver code (handles game initialization)
 
