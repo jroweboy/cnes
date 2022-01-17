@@ -8,6 +8,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  CPM_PATH: ${{ github.workspace }}/opt/cpm
   FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
   FAMISTUDIO_PATH: ${{ github.workspace }}/opt/famistudio
 
@@ -17,12 +18,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setup ccache
-        uses: hendrikmuhs/ccache-action@v1
+      - uses: hendrikmuhs/ccache-action@v1
+      - uses: ./.github/actions/cache_cpm
       - name: Build Linux Library
         run: |
           mkdir -p build && cd build
-          cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ../
+          cmake -G "Unix Makefiles" \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCNES_BUILD_SINGLE=On \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCPM_SOURCE_CACHE="${{ env.CPM_PATH }}" ../
           make -j2
 
   build_linux_example:
@@ -30,13 +36,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setup ccache
-        uses: hendrikmuhs/ccache-action@v1
+      - uses: hendrikmuhs/ccache-action@v1
+      - uses: ./.github/actions/cache_cpm
       - uses: ./.github/actions/cache_famistudio
         with:
           fsBin: ${{ env.FAMISTUDIO_BIN }}
       - name: Build Linux Example
         run: |
           mkdir -p example/build && cd example/build
-          cmake -G "Unix Makefiles" -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ../
+          cmake -G "Unix Makefiles" \
+            -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCNES_BUILD_SINGLE=On \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCPM_SOURCE_CACHE="${{ env.CPM_PATH }}" ../
           make -j2

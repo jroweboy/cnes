@@ -8,6 +8,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  CPM_PATH: ${{ github.workspace }}/opt/cpm
   FAMISTUDIO_BIN: 3.2.2/FamiStudio322-WinPortableExe.zip
   FAMISTUDIO_PATH: ${{ github.workspace }}/opt/famistudio
 
@@ -17,11 +18,15 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: ./.github/actions/cache_cpm
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build PC Library
         run: |
           mkdir -p build && cd build
-          cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
+          cmake -G "NMake Makefiles" \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCNES_BUILD_SINGLE=On \
+            -DCPM_SOURCE_CACHE="${{ env.CPM_PATH }}" ../
           nmake
 
   build_msvc_example:
@@ -29,6 +34,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: ./.github/actions/cache_cpm
       - uses: ./.github/actions/cache_famistudio
         with:
           fsBin: ${{ env.FAMISTUDIO_BIN }}
@@ -36,5 +42,9 @@ jobs:
       - name: Build Win MSVC example
         run: |
           mkdir -p example/build && cd example/build
-          cmake -G "NMake Makefiles" -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
+          cmake -G "NMake Makefiles" \
+            -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCNES_BUILD_SINGLE=On \
+            -DCPM_SOURCE_CACHE="${{ env.CPM_PATH }}" ../
           nmake

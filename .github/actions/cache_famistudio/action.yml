@@ -28,7 +28,7 @@ runs:
     # Download Famistudio
     - if: steps.cache_famistudio.outputs.cache-hit != 'true'
       run: |
-        md -Force ${{ github.workspace }}/opt/famistudio
+        New-Item -ItemType Directory -Force -Path ${{ github.workspace }}/opt/famistudio
         Invoke-WebRequest https://github.com/BleuBleu/FamiStudio/releases/download/${{ inputs.fsBin }} -OutFile famistudio.zip
         Expand-Archive -LiteralPath famistudio.zip -DestinationPath ${{ github.workspace }}/opt/famistudio
       shell: pwsh
