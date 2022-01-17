@@ -55,14 +55,9 @@ if (NOT NES)
     VERSION 2.0.20
     GITHUB_REPOSITORY "libsdl-org/SDL"
     GIT_TAG "release-2.0.20"
-    # Turn OFF SDL_SHARED so it doesn't set the SDL2::SDL2 target.
-    # SDL2Mixer looks for the shared target, so we create an alias
-    # for that to force it to run static instead
-    OPTIONS "SDL_STATIC_PIC ON" "SDL_SHARED OFF" "BUILD_SHARED_LIBS OFF"
+    OPTIONS "SDL_STATIC_PIC ON" "SDL_SHARED OFF"
   )
   
-  # prevent SDL2Mixer from creating its own jank SDL2::SDL2 target
-  # add_library(SDL2::SDL2 ALIAS SDL2-static)
   CPMAddPackage(
     NAME SDL2Mixer
     VERSION 2.0.20
