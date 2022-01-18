@@ -81,21 +81,21 @@ static inline u8 pad_to_held(u8 pad) {
   switch (pad) {
     case PAD_A:
     default:
-      return 0;
-    case PAD_B:
-      return 1;
-    case PAD_SELECT:
-      return 2;
-    case PAD_START:
-      return 3;
-    case PAD_UP:
-      return 4;
-    case PAD_DOWN:
-      return 5;
-    case PAD_LEFT:
-      return 6;
-    case PAD_RIGHT:
       return 7;
+    case PAD_B:
+      return 6;
+    case PAD_SELECT:
+      return 5;
+    case PAD_START:
+      return 4;
+    case PAD_UP:
+      return 3;
+    case PAD_DOWN:
+      return 2;
+    case PAD_LEFT:
+      return 1;
+    case PAD_RIGHT:
+      return 0;
   }
 }
 
@@ -103,11 +103,10 @@ static inline u8 pad_to_held(u8 pad) {
 // ====== Public functions ======
 
 void __LIB_CALLSPEC update_joypad() {
-  player1.pressed = player1.current && !player1.previous;
-  player1.released = !player1.current && player1.previous;
-
-  player2.pressed = player2.current && !player2.previous;
-  player2.released = !player2.current && player2.previous;
+  player1.pressed = player1.current & ~player1.previous;
+  player1.released = ~player1.current & player1.previous;
+  player2.pressed = player2.current & !player2.previous;
+  player2.released = ~player2.current & player2.previous;
 
   for (int i=0; i<8; ++i) {
     u8 button = 1<<i;

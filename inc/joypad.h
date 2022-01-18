@@ -24,8 +24,8 @@ extern volatile u8 p1_released;
 #define player1_current(button)   ((u8)(button) & p1_current)
 #define player1_released(button)  ((u8)(button) & p1_released)
 #ifndef CNES_DISABLE_JOYPAD_HELD
-extern volatile void* p1_held;
-#define CNES_DISABLE_HELD_LOOKUP(button) (\
+extern volatile u8 p1_held[8];
+#define CNES_HELD_LOOKUP(button) (\
   ((button) == PAD_A)       ? 0 : \
   ((button) == PAD_B)       ? 1 : \
   ((button) == PAD_SELECT)  ? 2 : \
@@ -34,8 +34,9 @@ extern volatile void* p1_held;
   ((button) == PAD_DOWN)    ? 5 : \
   ((button) == PAD_LEFT)    ? 6 : \
   ((button) == PAD_RIGHT)   ? 7 : 0)
+
 #define player1_held(button) \
-  (*(((u8*)p1_held) + CNES_HELD_LOOKUP((u8)(button))))
+  (p1_held[CNES_HELD_LOOKUP((u8)(button))])
 #endif //CNES_DISABLE_JOYPAD_HELD
 
 #ifndef CNES_DISABLE_JOYPAD_PLAYER2

@@ -7,7 +7,7 @@ void init_callback() {}
 void runframe() {
     update_joypad();
 
-    if (player1_pressed(PAD_A)) {
+    if (player1_held(PAD_A) == 60) {
         music_start(SONG_MEGALOVANIA);
     }
     if (player1_released(PAD_B)) {

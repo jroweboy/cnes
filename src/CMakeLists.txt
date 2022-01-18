@@ -15,6 +15,9 @@ target_compile_definitions(${module}_cdefine INTERFACE
   $<$<NOT:$<BOOL:CNES_DRAWING>>:"CNES_DISABLE_DRAWING">
 )
 
+
+file(GLOB cnes_headers ${cnes_SOURCE_DIR}/inc/*.h)
+
 if (NES)
   add_library(${module}_asmdefine INTERFACE)
   target_compile_options(${module}_asmdefine INTERFACE 
@@ -28,11 +31,12 @@ if (NES)
   )
   add_library(${module} STATIC
     nes/audio.s
-    nes/common.s
+    nes/common.inc
     nes/driver.s
     nes/engine.s
     nes/joypad.s
     nes/nes.c
+    ${cnes_headers}
   )
   target_link_libraries(${module} INTERFACE ${module}_asmdefine ${module}_cdefine)
 else()
@@ -42,6 +46,7 @@ else()
     pc/joypad.c
     pc/renderer.c
     pc/sdl.c
+    ${cnes_headers}
   )
   target_link_libraries(${module} 
     PUBLIC SDL2main SDL2-static SDL2_mixer ${module}_cdefine

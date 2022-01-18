@@ -3,19 +3,18 @@
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR 6502)
 
-set(CMAKE_C_COMPILER_ID cc65)
 set(CMAKE_C_COMPILER cl65)
-set(CMAKE_LINKER ld65)
-
+set(CMAKE_C_COMPILER_ID cc65)
 set(CMAKE_ASM_COMPILER cl65)
 set(CMAKE_ASM_COMPILER_ID ca65)
+set(CMAKE_LINKER ld65)
 
 find_program(_AR ar65)
 set(CMAKE_AR "${_AR}" CACHE FILEPATH "Archiver path override (prevents issues with cmake)")
 
 # 
 set(CC65_TARGET_FLAG "-t nes" CACHE STRING "Target flag for CC65")
-set(CC65_DEBUG_FLAG "-g -DDEBUG --asm-define DEBUG -m map.txt" CACHE STRING "Debug flags for CC65")
+set(CC65_DEBUG_FLAG "-g -DDEBUG --asm-define DEBUG" CACHE STRING "Debug flags for CC65")
 set(CC65_OPT_MAX_FLAG "-Oisr" CACHE STRING "Max Optimization flags for CC65")
 set(CC65_OPT_MIN_SIZE "-O" CACHE STRING "Optimization flags for Min Size Build CC65")
 
@@ -45,10 +44,14 @@ set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO_INIT}" CACHE ST
 set(CMAKE_ASM_SOURCE_FILE_EXTENSIONS s;S;asm)
 
 # Change the C and ASM compile commands a bit to spit out a listing file
+# and also a .s file for the c as well (for nes debugging)
 set(CMAKE_C_COMPILE_OBJECT
-    "<CMAKE_C_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -l <OBJECT>.lst -o <OBJECT> -c <SOURCE>")
+  "<CMAKE_C_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT>.s -S <SOURCE>"
+  "<CMAKE_C_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -l <OBJECT>.lst -o <OBJECT> -c <OBJECT>.s"
+)
 set(CMAKE_ASM_COMPILE_OBJECT
-    "<CMAKE_ASM_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -l <OBJECT>.lst -o <OBJECT> -c <SOURCE>")
+  "<CMAKE_ASM_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -l <OBJECT>.lst -o <OBJECT> -c <SOURCE>"
+)
 
 # Change the command when making a static library since ar65 doesn't allow removing .o from libs
 set(CMAKE_C_CREATE_STATIC_LIBRARY

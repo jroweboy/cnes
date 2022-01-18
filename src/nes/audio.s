@@ -1,5 +1,5 @@
 
-.include "common.s"
+.include "common.inc"
 
 .bss
 ; External variables that can be written to in order to play audio during the next NMI

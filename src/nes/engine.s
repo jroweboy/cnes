@@ -1,5 +1,5 @@
 
-.include "common.s"
+.include "common.inc"
 
 .zeropage
 
@@ -36,7 +36,8 @@ irq_scanline:   .res 1
 
 .export InitEngine
 .proc InitEngine
-  rts
+  jmp InitIRQ
+  ;rts
 .endproc
 
 SCANLINE_NMI           = 0
@@ -49,6 +50,8 @@ SCANLINE_NMI           = 0
   sta irq_handler_abs
   lda #OP_JMP_ABS
   sta screen_jmp_abs
+  ; disable scanline IRQ
+  sta IRQDISABLE
   rts
 .endproc
 

@@ -1,10 +1,16 @@
 
-.include "common.s"
+.include "common.inc"
 
 
 .zeropage
 ; Prevents NMI re-entry
 nmi_lock:       .res 1
+
+.repeat 16, i
+.ident(.concat("R", .string(i))): .res 1
+.globalzp .ident(.concat("R", .string(i)))
+.endrepeat
+
 .exportzp nmi_lock
 
 ; When the NMI fires outside of the wait frame loop, this is set
@@ -77,15 +83,13 @@ next_frame:     .res 1
   ldx #0
   stx $a000 ; Vertical mirroring
 
-  ; disable scanline IRQ
-  sta IRQDISABLE
-
   lda #1
   sta nmi_lock
   
-  jmp _init_callback
   jsr InitMusic
   jsr InitEngine
+  
+  jsr _init_callback
 
   ; NES is initialized, ready to begin!
   ; enable the NMI for graphical updates, and jump to our main program

@@ -1,4 +1,4 @@
-.include "common.s"
+.include "common.inc"
 
 .bss
 
@@ -16,7 +16,7 @@ player1: .res 4
 
 .ifndef CNES_DISABLE_JOYPAD_HELD
 p1_held: .res 8
-.export _p1_held     = player1 + HELD
+.export _p1_held     = p1_held
 .endif ;CNES_DISABLE_JOYPAD_HELD
 
 .ifndef CNES_DISABLE_JOYPAD_PLAYER2
@@ -28,44 +28,29 @@ player2: .res 4
 
 .ifndef CNES_DISABLE_JOYPAD_HELD
 p2_held: .res 8
-.export _p2_held     = player2 + HELD
+.export _p2_held     = p2_held
 .endif ;CNES_DISABLE_JOYPAD_HELD
 .endif ;CNES_DISABLE_JOYPAD_PLAYER2
 
 .code
 
-.macro MacroJoypadUpdate player, load
+.macro MacroCheckHeld player
 .scope
-  ; p1_released = !p1_current && p1_previous
-.if load = 1
-  lda player + CURRENT
-.endif
-  eor #$ff
-  and player + PREVIOUS
-  sta player + RELEASED
-
-  ; p1_pressed = p1_current && !p1_previous
-  lda player + PREVIOUS
-  eor #$ff
-  and player + CURRENT
-  sta player + PRESSED
-.ifdef CNES_JOYPAD_HELD
-  lda player + CURRENT
 Loop:
   rol
   bcc Else
   ; if this button is held increment
-  inc player + HELD,x
-  dex
-  bpl Loop
-  jmp Exit
+  inc player, x
+  bpl CheckExit
 Else:
   ; else clear this button
-  sty player + HELD,x
+  pha
+    tya
+    sta player, x
+  pla
+CheckExit:
   dex
   bpl Loop
-Exit:
-.endif
 .endscope
 .endmacro
 
@@ -74,10 +59,8 @@ Exit:
   ; Scratches A, X, Y
   lda player1 + CURRENT
   sta player1 + PREVIOUS
-.ifndef CNES_DISABLE_JOYPAD_HELD
-  ldx #7
+  ldx #0
   ldy #0
-.endif
 
 .ifndef CNES_DISABLE_JOYPAD_PLAYER2
   lda player2 + CURRENT
@@ -94,12 +77,36 @@ Reread:
   bne Reread
 
   ; now figure out which buttons are just pressed and which ones are just released
-  MacroJoypadUpdate player1, 0
+  ; p1_released = ~player1.current & player1.previous
+PlayerPressRelease:
+  lda player1 + CURRENT, x
+  eor #$ff
+  and player1 + PREVIOUS,x
+  sta player1 + RELEASED,x
 
+  ; p1_pressed = player1.current & ~player1.previous
+  lda player1 + PREVIOUS,x
+  eor #$ff
+  and player1 + CURRENT,x
+  sta player1 + PRESSED,x
 .ifndef CNES_DISABLE_JOYPAD_PLAYER2
-  MacroJoypadUpdate player2, 1
+    cpx #0
+    bne FinishedPlayer2
+    ldx #(player2 - player1)
+    bpl PlayerPressRelease
+FinishedPlayer2:
+  ldx #0
 .endif
-  rts
+
+.ifndef CNES_DISABLE_JOYPAD_HELD
+  lda player1 + CURRENT
+  MacroCheckHeld p1_held
+.ifndef CNES_DISABLE_JOYPAD_PLAYER2
+  lda player2 + CURRENT
+  ldx #0
+  MacroCheckHeld p2_held
+.endif ;CNES_DISABLE_JOYPAD_PLAYER2
+.endif ;CNES_DISABLE_JOYPAD_HELD
 .endproc
 
 .proc GamepadRead
@@ -112,7 +119,7 @@ Reread:
   sta player2 + CURRENT  ; player 2's buttons double as a ring counter
 .else
   sta player1 + CURRENT
-.endif
+.endif ;CNES_DISABLE_JOYPAD_PLAYER2
   lsr          ; now A is 0
   ; By storing 0 into JOYPAD1, the strobe bit is cleared and the reloading stops.
   ; This allows all 8 buttons (newly reloaded) to be read from JOYPAD1.
@@ -127,7 +134,7 @@ Loop:
     and #%00000011  ; ignore bits other than controller
     cmp #$01        ; Set carry if and only if nonzero
     rol player2 + CURRENT  ; Carry -> bit 0; bit 7 -> Carry
-.endif
+.endif ;CNES_DISABLE_JOYPAD_PLAYER2
   bcc Loop
   rts
 .endproc
