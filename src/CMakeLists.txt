@@ -15,8 +15,7 @@ target_compile_definitions(${module}_cdefine INTERFACE
   $<$<NOT:$<BOOL:CNES_DRAWING>>:"CNES_DISABLE_DRAWING">
 )
 
-
-file(GLOB cnes_headers ${cnes_SOURCE_DIR}/inc/*.h)
+file(GLOB cnes_headers ${PROJECT_SOURCE_DIR}/inc/*.h)
 
 if (NES)
   add_library(${module}_asmdefine INTERFACE)
