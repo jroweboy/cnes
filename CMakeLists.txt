@@ -3,76 +3,54 @@ cmake_minimum_required(VERSION 3.20)
 # CNES library
 project(cnes LANGUAGES C ASM)
 
-if (NOT CNES_BUILD_SINGLE AND (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR))
+if (NOT CNES_BUILD_SINGLE)
   # use external project add to build the application into separate subfolders
+  # we have to do this BEFORE adding project so that we can add toolchain files
+  
+  # hacky workaround to forward cmake args to ExternalProject
+  # https://stackoverflow.com/a/48555098
+  get_cmake_property(vars CACHE_VARIABLES)
+  foreach(var ${vars})
+    get_property(currentHelpString CACHE "${var}" PROPERTY HELPSTRING)
+    if("${var}" MATCHES "No help, variable specified on the command line." OR "${var}" MATCHES "CNES_")
+      # message("${var} = [${${var}}]  --  ${currentHelpString}") # uncomment to see the variables being processed
+      list(APPEND CMDLINE_ARGS "-D${var}=${${var}}")
+    endif()
+  endforeach()
+
+  if(MSVC)
+    set(CNES_NATIVE_PRESET msvc)
+  elseif(MSYS OR MINGW)
+    set(CNES_NATIVE_PRESET mingw)
+  else()
+    set(CNES_NATIVE_PRESET native)
+  endif()
+
   include(ExternalProject)
-  get_filename_component(CNES_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/cmake/cc65-toolchain.cmake ABSOLUTE)
-  get_filename_component(CNES_PREFIX_PATH ${CMAKE_SOURCE_DIR}/tools/cc65 ABSOLUTE)
   ExternalProject_Add(nes
     SOURCE_DIR ${CMAKE_SOURCE_DIR}
     BINARY_DIR ${CMAKE_BINARY_DIR}/nes
     BUILD_ALWAYS 1
     INSTALL_COMMAND cmake -E echo "Skipping install step."
     TEST_COMMAND cmake -E echo "Skipping test step."
-    CMAKE_ARGS
-      -DCMAKE_PREFIX_PATH:PATH=${CNES_PREFIX_PATH}
-      -DCMAKE_FRAMEWORK_PATH:PATH=${CNES_FRAMEWORK_PATH}
-      -DCMAKE_TOOLCHAIN_FILE:PATH=${CNES_TOOLCHAIN_FILE}
-      -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-      -DCMAKE_MAKE_PROGRAM:FILEPATH=${CMAKE_MAKE_PROGRAM}
-      -DCNES_BUILD_SINGLE=On
+    CMAKE_ARGS --preset nes ${CMDLINE_ARGS}
   )
-  ExternalProject_Add(pc
+  ExternalProject_Add(native
     SOURCE_DIR ${CMAKE_SOURCE_DIR}
-    BINARY_DIR ${CMAKE_BINARY_DIR}/pc
+    BINARY_DIR ${CMAKE_BINARY_DIR}/native
     BUILD_ALWAYS 1
     INSTALL_COMMAND cmake -E echo "Skipping install step."
     TEST_COMMAND cmake -E echo "Skipping test step."
-    CMAKE_ARGS
-      -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-      -DCMAKE_MAKE_PROGRAM:FILEPATH=${CMAKE_MAKE_PROGRAM}
-      -DCNES_BUILD_SINGLE=On
+    CMAKE_ARGS --preset ${CNES_NATIVE_PRESET} ${CMDLINE_ARGS}
   )
   return()
 endif()
+
 
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "6502")
   set(NES ON CACHE BOOL "" FORCE)
 endif()
 
-include(CMakeDependentOption)
-option(CNES_ENGINE "Enable CNES IRQ/NMI engine" ON)
-option(CNES_AUDIO "Enable CNES audio engine (using famistudio)" ON)
-option(CNES_JOYPAD "Enable CNES Joypad support" ON)
-option(CNES_DRAWING "Enable CNES Map support" ON)
-cmake_dependent_option(CNES_JOYPAD_HELD "Enable button held checking. (Adds 8 bytes of RAM per player)" ON CNES_JOYPAD OFF)
-cmake_dependent_option(CNES_JOYPAD_PLAYER2 "Enable polling for player 2. (Adds 4-12 bytes of RAM)" ON CNES_JOYPAD OFF)
-
-if (NOT NES)
-  # Turn off BUILD_SHARED_LIBS to convince SDL_mixer to build static
-  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-
-  # fetch SDL2 dependency and build it.
-  include(${PROJECT_SOURCE_DIR}/cmake/CPM.cmake)
-  CPMAddPackage(
-    NAME SDL2
-    VERSION 2.0.20
-    GITHUB_REPOSITORY "libsdl-org/SDL"
-    GIT_TAG "release-2.0.20"
-    OPTIONS "SDL_STATIC_PIC ON" "SDL_SHARED OFF"
-  )
-  if(NOT TARGET SDL2::SDL2)
-    add_library(SDL2::SDL2 ALIAS SDL2-static)
-  endif()
-  CPMAddPackage(
-    NAME SDL2Mixer
-    VERSION 2.0.20
-    GITHUB_REPOSITORY "libsdl-org/SDL_mixer"
-    GIT_TAG "60a82b21bdbf2f4626eebee11600f29cebbe1c49"
-    OPTIONS "SUPPORT_OGG ON"
-  )
-endif()
-
-set(CNES_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/inc)
-
 add_subdirectory(src)
+add_subdirectory(example)
+

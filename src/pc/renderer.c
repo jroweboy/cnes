@@ -13,13 +13,13 @@ int renderer_init() {
     return CNES_FAILURE;
   }
 
-  SDL_Window* win = SDL_CreateWindow("CNES", 100, 100, 256, 240, SDL_WINDOW_SHOWN);
+  win = SDL_CreateWindow("CNES", 100, 100, 256, 240, SDL_WINDOW_SHOWN);
   if (win == NULL) {
     SDL_LogError(LOG_RENDER, "SDL_CreateWindow Error: %s\n", SDL_GetError());
     return CNES_FAILURE;
   }
 
-  SDL_Renderer* ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   if (ren == NULL) {
     SDL_LogError(LOG_RENDER, "SDL_CreateRenderer Error: %s\n", SDL_GetError());
     SDL_DestroyWindow(win);

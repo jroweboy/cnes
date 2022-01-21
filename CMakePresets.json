@@ -1,0 +1,66 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Config (Multi Build)",
+      "description": "Default build using Ninja Multi-Config generator. Builds both the NES and Native PC version for the current OS",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build/multi",
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "${sourceDir}/tools/cc65",
+        "CMAKE_MODULE_PATH": "${sourceDir}/cmake",
+        "CMAKE_FRAMEWORK_PATH": "${sourceDir}/tools/famistudio;${sourceDir}/scripts"
+      }
+    },
+    {
+      "name": "nes",
+      "inherits": "default",
+      "displayName": "NES Build",
+      "description": "NES-only build using Ninja Multi-Config generator",
+      "binaryDir": "${sourceDir}/build/nes",
+      "toolchainFile": "${sourceDir}/cmake/cc65-toolchain.cmake",
+      "cacheVariables": {
+        "CNES_BUILD_SINGLE": "ON"
+      }
+    },
+    {
+      "name": "native",
+      "inherits": "default",
+      "displayName": "Native PC Build",
+      "description": "Native PC-only build using Ninja Multi-Config generator",
+      "binaryDir": "${sourceDir}/build/native",
+      "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-${hostSystemName}-static",
+        "CNES_BUILD_SINGLE": "ON"
+      }
+    },
+    {
+      "name": "msvc",
+      "inherits": "native",
+      "displayName": "Windows MSVC Build",
+      "generator": "Visual Studio 16 2019",
+      "description": "Generates a Visual Studio 2019 solution for the native PC port",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "mingw",
+      "inherits": "native",
+      "displayName": "Windows MinGW build",
+      "description": "Builds PC build with MinGW toolset for the native PC port",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-mingw-static"
+      }
+    }
+  ]
+}

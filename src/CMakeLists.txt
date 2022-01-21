@@ -2,32 +2,62 @@ if (NES)
   set(module cnes.nes)
 else()
   set(module cnes.pc)
+
+  # find the dependencies from vcpkg
+  find_package(sdl2 REQUIRED)
+  find_package(sdl2-mixer REQUIRED)
+  find_library(LIBVORBIS vorbis REQUIRED)
+  find_library(LIBOGG ogg REQUIRED)
 endif()
 
-add_library(${module}_cdefine INTERFACE)
-target_compile_definitions(${module}_cdefine INTERFACE 
 
-  $<$<NOT:$<BOOL:CNES_ENGINE>>:"CNES_DISABLE_ENGINE">
-  $<$<NOT:$<BOOL:CNES_JOYPAD>>:"CNES_DISABLE_JOYPAD">
-  $<$<NOT:$<BOOL:CNES_JOYPAD_HELD>>:"CNES_DISABLE_JOYPAD_HELD">
-  $<$<NOT:$<BOOL:CNES_JOYPAD_PLAYER2>>:"CNES_DISABLE_JOYPAD_PLAYER2">
-  $<$<NOT:$<BOOL:CNES_AUDIO>>:"CNES_DISABLE_AUDIO">
-  $<$<NOT:$<BOOL:CNES_DRAWING>>:"CNES_DISABLE_DRAWING">
+include(CMakeDependentOption)
+add_library(${module}_cdefine INTERFACE)
+add_library(${module}_asmdefine INTERFACE)
+
+macro(cnes_option)
+  set(options DEPENDENT)
+  set(oneValueArgs NAME)
+  set(multiValueArgs ARGS)
+  cmake_parse_arguments(CNES_OPTION "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+  if (NOT CNES_OPTION_NAME)
+    message(FATAL_ERROR "Option name is required!")
+  endif()
+
+  if (CNES_OPTION_DEPENDENT)
+    cmake_dependent_option(${CNES_OPTION_NAME} ${CNES_OPTION_ARGS})
+  else()
+    option(${CNES_OPTION_NAME} ${CNES_OPTION_ARGS})
+  endif()
+
+  target_compile_definitions(${module}_cdefine INTERFACE $<$<NOT:$<BOOL:CNES_OPTION_NAME>>:"DISABLE_CNES_OPTION_NAME">)
+  target_compile_options(${module}_asmdefine INTERFACE $<$<NOT:$<BOOL:CNES_OPTION_NAME>>:"--asm-define DISABLE_CNES_OPTION_NAME">)
+endmacro()
+
+cnes_option(NAME CNES_ENGINE ARGS "Enable CNES IRQ engine" ON)
+
+cnes_option(NAME CNES_AUDIO ARGS "Enable CNES audio engine (using famistudio)" ON)
+cnes_option(DEPENDENT NAME CNES_AUDIO_GEN ARGS "Automatically generate the required files from the path set in CNES_AUDIO_PATH" ON CNES_AUDIO OFF)
+
+cnes_option(NAME CNES_JOYPAD ARGS "Enable CNES Joypad support" ON)
+cnes_option(DEPENDENT NAME CNES_JOYPAD_HELD ARGS "Enable button held checking. (Adds 8 bytes of RAM per player)" ON CNES_JOYPAD OFF)
+cnes_option(DEPENDENT NAME CNES_JOYPAD_PLAYER2 ARGS "Enable polling for player 2. (Adds 4-12 bytes of RAM)" ON CNES_JOYPAD OFF)
+
+cnes_option(NAME CNES_DRAWING ARGS "Enable CNES Screen support" ON)
+
+set(cnes_headers
+  inc/audio.h
+  inc/cnes.h
+  inc/common_types.h
+  inc/drawing.h
+  inc/engine.h
+  inc/famistudio_cc65.h
+  inc/joypad.h
+  inc/nes2header.h
 )
 
-file(GLOB cnes_headers ${PROJECT_SOURCE_DIR}/inc/*.h)
-
 if (NES)
-  add_library(${module}_asmdefine INTERFACE)
-  target_compile_options(${module}_asmdefine INTERFACE 
-  
-    $<$<NOT:$<BOOL:CNES_ENGINE>>:"--asm-define CNES_DISABLE_ENGINE">
-    $<$<NOT:$<BOOL:CNES_JOYPAD>>:"--asm-define CNES_DISABLE_JOYPAD">
-    $<$<NOT:$<BOOL:CNES_JOYPAD_HELD>>:"--asm-define CNES_DISABLE_JOYPAD_HELD">
-    $<$<NOT:$<BOOL:CNES_JOYPAD_PLAYER2>>:"--asm-define CNES_DISABLE_JOYPAD_PLAYER2">
-    $<$<NOT:$<BOOL:CNES_AUDIO>>:"--asm-define CNES_DISABLE_AUDIO">
-    $<$<NOT:$<BOOL:CNES_DRAWING>>:"--asm-define CNES_DISABLE_DRAWING">
-  )
   add_library(${module} STATIC
     nes/audio.s
     nes/common.inc
@@ -39,6 +69,7 @@ if (NES)
   )
   target_link_libraries(${module} INTERFACE ${module}_asmdefine ${module}_cdefine)
 else()
+
   add_library(${module} STATIC
     pc/audio.c
     pc/cnes_internal.h
@@ -48,10 +79,10 @@ else()
     ${cnes_headers}
   )
   target_link_libraries(${module} 
-    PUBLIC SDL2main SDL2-static SDL2_mixer ${module}_cdefine
+    PRIVATE SDL2::SDL2main SDL2::SDL2-static SDL2::SDL2_mixer ${LIBVORBIS} ${LIBOGG} ${module}_cdefine
   )
 endif()
 
-target_include_directories(${module}
-  PUBLIC ${CNES_INCLUDE_DIR}
-)
+target_include_directories(${module} PUBLIC inc/)
+
+add_library(CNES::CNES ALIAS ${module})

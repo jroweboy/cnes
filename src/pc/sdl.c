@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   // main loop
   while (!close) {
     
-    currentTime = SDL_GetTicks64();
+    currentTime = SDL_GetTicks();
     deltaTime = currentTime - lastUpdateTime;
     timeToSleep = tickInteval - deltaTime;
     if (timeToSleep > 0) {
