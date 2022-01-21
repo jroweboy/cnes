@@ -11,6 +11,8 @@ env:
   CPM_PATH: ${{ github.workspace }}/opt/cpm
   FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
   FAMISTUDIO_PATH: ${{ github.workspace }}/opt/famistudio
+  CMAKE_C_COMPILER_LAUNCHER: ccache
+  CMAKE_CXX_COMPILER_LAUNCHER: ccache
 
 jobs:
   build_linux_lib:
@@ -19,17 +21,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: hendrikmuhs/ccache-action@v1
-      - uses: ./.github/actions/cache_cpm
+      - uses: lukka/get-cmake@latest
+      - uses: lukka/run-vcpkg@v10
       - name: Build Linux Library
-        run: |
-          mkdir -p build && cd build
-          cmake -G "Unix Makefiles" \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-            -DCNES_BUILD_SINGLE=On \
-            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DCPM_SOURCE_CACHE="${{ env.CPM_PATH }}" ../
-          make -j2
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'native-library'
 
   build_linux_example:
     name: Linux Example Build
@@ -37,7 +34,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: hendrikmuhs/ccache-action@v1
-      - uses: ./.github/actions/cache_cpm
       - uses: ./.github/actions/cache_famistudio
         with:
           fsBin: ${{ env.FAMISTUDIO_BIN }}

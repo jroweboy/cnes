@@ -51,6 +51,10 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "6502")
   set(NES ON CACHE BOOL "" FORCE)
 endif()
 
-add_subdirectory(src)
-add_subdirectory(example)
+option(CNES_BUILD_EXAMPLE "Builds the CNES example exe" OFF)
 
+add_subdirectory(src)
+
+if (CNES_BUILD_EXAMPLE)
+  add_subdirectory(example)
+endif()

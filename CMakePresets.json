@@ -15,7 +15,8 @@
       "cacheVariables": {
         "CMAKE_PREFIX_PATH": "${sourceDir}/tools/cc65",
         "CMAKE_MODULE_PATH": "${sourceDir}/cmake",
-        "CMAKE_FRAMEWORK_PATH": "${sourceDir}/tools/famistudio;${sourceDir}/scripts"
+        "CMAKE_FRAMEWORK_PATH": "${sourceDir}/tools/famistudio;${sourceDir}/scripts",
+        "CNES_BUILD_EXAMPLE": "ON"
       }
     },
     {
@@ -60,6 +61,38 @@
       "description": "Builds PC build with MinGW toolset for the native PC port",
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": "x64-mingw-static"
+      }
+    },
+    {
+      "name": "nes-library",
+      "inherits": "nes",
+      "displayName": "NES Library Only Build",
+      "cacheVariables": {
+        "CNES_BUILD_EXAMPLE": "OFF"
+      }
+    },
+    {
+      "name": "native-library",
+      "inherits": "native",
+      "displayName": "Native PC Library Only Build",
+      "cacheVariables": {
+        "CNES_BUILD_EXAMPLE": "OFF"
+      }
+    },
+    {
+      "name": "msvc-library",
+      "inherits": "msvc",
+      "displayName": "Windows MSVC Build",
+      "cacheVariables": {
+        "CNES_BUILD_EXAMPLE": "OFF"
+      }
+    },
+    {
+      "name": "mingw-library",
+      "inherits": "mingw",
+      "displayName": "Windows MinGW build",
+      "cacheVariables": {
+        "CNES_BUILD_EXAMPLE": "OFF"
       }
     }
   ]

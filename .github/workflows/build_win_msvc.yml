@@ -18,30 +18,26 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/cache_cpm
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Build PC Library
-        run: |
-          mkdir -p build && cd build
-          cmake -G "NMake Makefiles" `
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo `
-            -DCNES_BUILD_SINGLE=On `
-            -DCPM_SOURCE_CACHE="${{ env.CPM_PATH }}" ../
-          nmake
+      - uses: lukka/get-cmake@latest
+      - uses: lukka/run-vcpkg@v10
+      - name: Build MSVC Library
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'msvc-library'
 
   build_msvc_example:
     name: MSVC Example Build
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/cache_cpm
       - uses: ./.github/actions/cache_famistudio
         with:
           fsBin: ${{ env.FAMISTUDIO_BIN }}
       - uses: ilammy/msvc-dev-cmd@v1
       - uses: lukka/get-cmake@latest
       - uses: lukka/run-vcpkg@v10
-      - name: Build Linux Example
+      - name: Build MSVC Example
         uses: lukka/run-cmake@v10
         with:
           configurePreset: 'msvc'
