@@ -41,14 +41,9 @@ jobs:
       - uses: ./.github/actions/cache_famistudio
         with:
           fsBin: ${{ env.FAMISTUDIO_BIN }}
+      - uses: lukka/get-cmake@latest
+      - uses: lukka/run-vcpkg@v10
       - name: Build Linux Example
-        run: |
-          mkdir -p example/build && cd example/build
-          cmake -G "Unix Makefiles" \
-            -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-            -DCNES_BUILD_SINGLE=On \
-            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DCPM_SOURCE_CACHE="${{ env.CPM_PATH }}" ../
-          make -j2
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'native'
