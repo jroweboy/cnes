@@ -38,7 +38,7 @@
       "binaryDir": "${sourceDir}/build/native",
       "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-${hostSystemName}-static",
+        "VCPKG_TARGET_TRIPLET": "x64-${hostSystemName}",
         "CNES_BUILD_SINGLE": "ON"
       }
     },
@@ -94,6 +94,36 @@
       "cacheVariables": {
         "CNES_BUILD_EXAMPLE": "OFF"
       }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default"
+    },
+    {
+      "name": "native",
+      "configurePreset": "native"
+    },
+    {
+      "name": "msvc",
+      "configurePreset": "msvc"
+    },
+    {
+      "name": "mingw",
+      "configurePreset": "mingw"
+    },
+    {
+      "name": "native-library",
+      "configurePreset": "native-library"
+    },
+    {
+      "name": "msvc-library",
+      "configurePreset": "msvc-library"
+    },
+    {
+      "name": "mingw-library",
+      "configurePreset": "mingw-library"
     }
   ]
 }

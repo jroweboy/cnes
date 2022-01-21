@@ -27,6 +27,7 @@ jobs:
         uses: lukka/run-cmake@v10
         with:
           configurePreset: 'msvc-library'
+          buildPreset: 'msvc-library'
 
   build_msvc_example:
     name: MSVC Example Build
@@ -45,3 +46,4 @@ jobs:
         uses: lukka/run-cmake@v10
         with:
           configurePreset: 'msvc'
+          buildPreset: 'msvc'

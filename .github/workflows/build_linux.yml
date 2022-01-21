@@ -29,6 +29,7 @@ jobs:
         uses: lukka/run-cmake@v10
         with:
           configurePreset: 'native-library'
+          buildPreset: 'native-library'
 
   build_linux_example:
     name: Linux Example Build
@@ -47,3 +48,4 @@ jobs:
         uses: lukka/run-cmake@v10
         with:
           configurePreset: 'native'
+          buildPreset: 'native'
