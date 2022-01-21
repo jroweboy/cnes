@@ -18,6 +18,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
       - uses: ilammy/msvc-dev-cmd@v1
       - uses: lukka/get-cmake@latest
       - uses: lukka/run-vcpkg@v10
@@ -31,6 +33,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
       - uses: ./.github/actions/cache_famistudio
         with:
           fsBin: ${{ env.FAMISTUDIO_BIN }}

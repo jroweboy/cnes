@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
       - uses: hendrikmuhs/ccache-action@v1
       - uses: lukka/get-cmake@latest
       - uses: lukka/run-vcpkg@v10
@@ -33,6 +35,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
       - uses: hendrikmuhs/ccache-action@v1
       - uses: ./.github/actions/cache_famistudio
         with:
