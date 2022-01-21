@@ -19,11 +19,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/cache_cc65
+      - uses: lukka/get-cmake@latest
       - name: Build NES Library
-        run: |
-          mkdir -p build && cd build
-          cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH=${{ env.CC65_PATH }} -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
-          make
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'nes-library'
+          buildPreset: 'nes-library'
 
   build_nes_example:
     name: NES Example Build
@@ -34,8 +35,9 @@ jobs:
       - uses: ./.github/actions/cache_famistudio
         with:
           fsBin: ${{ env.FAMISTUDIO_BIN }}
+      - uses: lukka/get-cmake@latest
       - name: Build NES Example
-        run: |
-          mkdir -p example/build && cd example/build
-          cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/cc65-toolchain.cmake -DCMAKE_PREFIX_PATH="${{ env.CC65_PATH }}" -DCMAKE_FRAMEWORK_PATH="${{ env.FAMISTUDIO_PATH }}" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCNES_BUILD_SINGLE=On ../
-          make
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'nes'
+          buildPreset: 'nes'

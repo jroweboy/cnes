@@ -48,6 +48,9 @@
       "displayName": "Windows MSVC Build",
       "generator": "Visual Studio 16 2019",
       "description": "Generates a Visual Studio 2019 solution for the native PC port",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static"
+      },
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
