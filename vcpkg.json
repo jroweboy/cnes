@@ -4,7 +4,13 @@
   "dependencies": [
     {
       "name": "sdl2",
-      "features": []
+      "default-features": false,
+      "features": ["x11"],
+      "platform": "linux"
+    },
+    {
+      "name": "sdl2",
+      "platform": "!linux"
     },
     {
       "name": "sdl2-mixer",
