@@ -8,7 +8,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CPM_PATH: ${{ github.workspace }}/opt/cpm
   FAMISTUDIO_BIN: 3.2.2/FamiStudio322-LinuxAMD64.zip
   FAMISTUDIO_PATH: ${{ github.workspace }}/opt/famistudio
   CMAKE_C_COMPILER_LAUNCHER: ccache

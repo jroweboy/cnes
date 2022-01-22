@@ -3,6 +3,9 @@
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR 6502)
 
+# Check for user provided CC65_PATH environment variable
+list(APPEND CMAKE_PREFIX_PATH $ENV{CC65_PATH})
+
 set(CMAKE_C_COMPILER cl65)
 set(CMAKE_C_COMPILER_ID cc65)
 set(CMAKE_ASM_COMPILER cl65)

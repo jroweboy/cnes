@@ -4,7 +4,7 @@ else()
   set(module cnes.pc)
 
   # find the dependencies from vcpkg
-  find_package(sdl2 REQUIRED)
+  find_package(SDL2 REQUIRED)
   find_package(sdl2-mixer REQUIRED)
   find_library(LIBVORBIS vorbis REQUIRED)
   find_library(LIBOGG ogg REQUIRED)
