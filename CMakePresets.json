@@ -125,7 +125,6 @@
     },
     {
       "name": "native-library",
-      "hidden": true,
       "configurePreset": "native-library"
     },
     {
