@@ -1,0 +1,91 @@
+Main Editor hotkeys 0.9.0
+===========================================
+
+[F1]				- Active tab: nametable/map editor
+[F2]				- Active tab: metasprite editor
+[F4]				- Open/close CHR editor
+(or Num5)			
+[F5]				- Open/close metasprite manager
+[F12]				- Export nametable/map as bmp
+
+[PAUSE KEY] 	- Transluscent mode. Useful for comparisons, tracing, and marking instances as inactive. 
+[DEL] 			- Delete current selection
+
+
+Metasprite exclusive hotkeys
+------------------------------------------
+[H]				- Flip metasprite horizontally
+[V]				- Flip metasprite vertically
+
+[arrows]			- Move sprite(s) 1px
+[arrows + shift]		- Move sprite(s) 8px
+[arrows/home/end + ctrl]	- Step selected sprite
+[arrows/home/end + ctrl + shift]- Select multiple sprites
+
+Nametable exclusive hotkeys
+------------------------------------------
+[V+click]		- pasteclick. works on palettes, tileset, nametable
+[C+click]		- copyclick. works on palettes.
+
+[H]				- view grid(s) on/off 
+[J]				- 1x grid set/clear
+[K]				- 2x grid set/clear
+[L]				- 4x grid set/clear
+
+
+General hotkeys
+------------------------------------------
+[1-4]		- Pick colour  
+[1-4 + shift]	- Pick subpalette
+
+[5]		- select normal/replace ink mode (preselected)
+[6]		- select add 1 ink (although l mouse + shift tends to be quicker)
+[7]		- select sub 1 ink (although l mouse + shift + alt  tends to be quicker)
+
+[5-8 + shift]	- Switch subpalette set A through D
+
+[RGBM]		- set/clear red/green/blue emphasis/monochrome mode
+
+[F]		- fills a selected area of the nametable/map with a single selected pattern from the tileset.
+(or alt+backsp)
+
+[S]		- View selected only
+[A]		- Attribute checker
+[D]		- view grid(s) on/off
+
+[W]		- Apply tiles
+[E]		- Apply attributes
+[T]		- Enter/leave Type In Mode. If a select cursor is present while in Type In mode, 
+		  you need to exit with Ctrl+T. Alternately, deselect the type cursor with ctrl+shift+A.
+
+[X]		- Toggle tilesets A/B
+
+
+[Comma]		- Previous metasprite
+[Period]	- Next metasprite
+
+[Num 5]		- close/re-open CHR editor
+[other Nums]	- navigate current tile
+
+
+Arrow keys:
+-------------------------------------------
+while in type in mode 		- move the type in cursor
+
+while on metasprite tab		- move sprite 1px
+
++shift				- move sprite 8px
+
++ctrl				- select object (sprite) in a metasprite
+
++ctrl+shift			- select several objects (sprites) in a metasprite
+
+while selection on nametable
++ctrl+alt 			- move the selection around
+
+Ctrl				- nudge nametable contents finely (without moving attributes)
+
+ctrl + shift			- nudge nametable contents coarsely (with attributes)
+
+else				- pan view (on a map larger than the viewport)
+

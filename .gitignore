@@ -2,6 +2,8 @@ lib/
 build/
 example/bin/
 example/build/
-tools/famistudio/Autosaves
-tools/famistudio/Demo\ Songs
-
+**/famistudio/Autosaves
+**/famistudio/Demo\ Songs
+**/tiled/example
+**/cc65/samples
+**/cc65/html
