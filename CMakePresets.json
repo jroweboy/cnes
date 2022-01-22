@@ -105,6 +105,10 @@
       "configurePreset": "default"
     },
     {
+      "name": "nes",
+      "configurePreset": "nes"
+    },
+    {
       "name": "native",
       "configurePreset": "native"
     },
@@ -115,6 +119,10 @@
     {
       "name": "mingw",
       "configurePreset": "mingw"
+    },
+    {
+      "name": "nes-library",
+      "configurePreset": "nes-library"
     },
     {
       "name": "native-library",
