@@ -1,6 +1,6 @@
 #!/bin/env sh
 
-../tools/inotifywait.exe -m -r ./src/ ../inc/ ./CMakeLists.txt ../CMakeLists.txt ../scripts ../src/ | 
+../tools/Windows/inotifywait.exe -m -r ./src/ ../inc/ ./CMakeLists.txt ../CMakeLists.txt ../scripts ../src/ | 
     while read -r date time dir file;
         do
         flag=$((1-flag))

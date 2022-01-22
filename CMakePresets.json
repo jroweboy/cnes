@@ -13,9 +13,9 @@
       "generator": "Ninja Multi-Config",
       "binaryDir": "${sourceDir}/build/multi",
       "cacheVariables": {
-        "CMAKE_PREFIX_PATH": "${sourceDir}/tools/cc65",
+        "CMAKE_PREFIX_PATH": "${sourceDir}/tools/${hostSystemName}/cc65",
         "CMAKE_MODULE_PATH": "${sourceDir}/cmake",
-        "CMAKE_FRAMEWORK_PATH": "${sourceDir}/tools/famistudio;${sourceDir}/scripts",
+        "CMAKE_FRAMEWORK_PATH": "${sourceDir}/tools/${hostSystemName}/famistudio;${sourceDir}/scripts",
         "CNES_BUILD_EXAMPLE": "ON"
       }
     },
@@ -38,7 +38,6 @@
       "binaryDir": "${sourceDir}/build/native",
       "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-${hostSystemName}",
         "CNES_BUILD_SINGLE": "ON"
       }
     },
@@ -126,6 +125,7 @@
     },
     {
       "name": "native-library",
+      "hidden": true,
       "configurePreset": "native-library"
     },
     {

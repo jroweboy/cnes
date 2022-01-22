@@ -46,7 +46,6 @@ function(cnes_audio_gen)
   if (NOT audio_script)
     message(FATAL_ERROR "Cannot generate audio output: Unable to find generate_audio.py")
   endif()
-
   add_custom_command(
     OUTPUT ${audio_gen}
     COMMAND ${PYTHON_EXECUTABLE} ${audio_script} ${build_type} --famistudio-path=${famistudio} ${CNES_AUDIO_GEN_SRC} ${CNES_AUDIO_GEN_DEST}

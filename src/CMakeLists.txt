@@ -8,6 +8,8 @@ else()
   find_package(sdl2-mixer CONFIG REQUIRED)
   find_library(LIBVORBIS vorbis REQUIRED)
   find_library(LIBOGG ogg REQUIRED)
+  find_library(LIBVORBISENC vorbisenc REQUIRED)
+  find_library(LIBVORBISFILE vorbisfile REQUIRED)
 endif()
 
 
@@ -79,7 +81,7 @@ else()
     ${cnes_headers}
   )
   target_link_libraries(${module} 
-    PRIVATE SDL2::SDL2main SDL2::SDL2-static SDL2::SDL2_mixer ${LIBVORBIS} ${LIBOGG} ${module}_cdefine
+    PRIVATE SDL2::SDL2main SDL2::SDL2-static SDL2::SDL2_mixer ${LIBVORBIS} ${LIBVORBISENC} ${LIBVORBISFILE} ${LIBOGG} ${module}_cdefine
   )
 endif()
 

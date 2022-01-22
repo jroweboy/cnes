@@ -14,18 +14,14 @@ import sys
 # debugging
 import inspect
 
-def fm(*args, famistudio_path=None):
-  # Default location for now is ../tools/famistudio/Famistudio
-  if not famistudio_path:
-    file_path = os.path.abspath(os.path.dirname(__file__))
-    famistudio_path = f"{file_path}/../tools/famistudio/Famistudio"
+def fm(*args, famistudio_path):
   cmd = [famistudio_path, *args]
   if sys.platform != "win32":
     mono = str(shutil.which("mono"))
     cmd = [mono] + cmd
-    if 'CI' in os.environ:
-      xvfb = str(shutil.which("xvfb-run"))
-      cmd = [xvfb, '--auto-servernum'] + cmd
+    xvfb = str(shutil.which("xvfb-run"))
+    cmd = [xvfb, '--auto-servernum'] + cmd
+  print(f"FamiStudio CMD ({' '.join(cmd)})")
   done = subprocess.run(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, text=True)
   print(f"FamiStudio CMD ({' '.join(cmd)}) output:\n{done}")
   return done.stdout
@@ -265,7 +261,6 @@ SFXAddrLo:   .byte {song_data['sfxlo']}"""
 
   with open(f"{fout}/cnes_nes_audio_gen_internal.s", 'w') as file:
     file.write(template)
-  print()
   define = '\n'.join(define)
   with open(f"{fout}/cnes_nes_audio_gen_internal.h", 'w') as f:
     f.write(f'''
@@ -287,7 +282,7 @@ def main():
   parser.add_argument('-n', '--nes', action="store_true")
   parser.add_argument('-p', '--pc', action="store_true")
   parser.add_argument('-F', '--famistudio-path', type=str,
-                      help='Path to the famistudio executable (Default: `../tools/famistudio/FamiStudio.exe`)''')
+                      help='Path to the famistudio executable''')
   parser.add_argument('fin', metavar='in', type=str,
                       help='Input Directory of fms files to build the song data from')
   parser.add_argument('fout', metavar='out', type=str,

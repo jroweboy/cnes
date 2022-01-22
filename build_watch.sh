@@ -1,6 +1,6 @@
 #!/bin/env sh
 
-tools/inotifywait.exe -m -r ./src/ ./inc/ ./Makefile | 
+tools/Windows/inotifywait.exe -m -r ./src/ ./inc/ ./Makefile | 
     while read -r date time dir file;
         do
         flag=$((1-flag))
