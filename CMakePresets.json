@@ -11,7 +11,7 @@
       "displayName": "Default Config (Multi Build)",
       "description": "Default build using Ninja Multi-Config generator. Builds both the NES and Native PC version for the current OS",
       "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/build/multi",
+      "binaryDir": "${sourceDir}/build/",
       "cacheVariables": {
         "CMAKE_PREFIX_PATH": "${sourceDir}/tools/${hostSystemName}/cc65",
         "CMAKE_MODULE_PATH": "${sourceDir}/cmake",
@@ -38,6 +38,7 @@
       "binaryDir": "${sourceDir}/build/native",
       "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
+        "VCPKG_OVERLAY_PORTS": "${sourceDir}/ports",
         "CNES_BUILD_SINGLE": "ON"
       }
     },

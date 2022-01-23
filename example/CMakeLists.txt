@@ -17,7 +17,7 @@ else()
   )
 endif()
 
-add_executable(${CMAKE_PROJECT_NAME}
+add_executable(${PROJECT_NAME}
   src/main.c
   ${platform_srcs}
 )
@@ -25,14 +25,14 @@ add_executable(${CMAKE_PROJECT_NAME}
 include(CNESAudioGen)
 cnes_audio_gen(SRC ${CMAKE_CURRENT_SOURCE_DIR}/assets/audio DEST ${CMAKE_BINARY_DIR}/gen)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE -Wl,--start-group CNES::CNES CNES::AudioGen)
+target_link_libraries(${PROJECT_NAME} PRIVATE -Wl,--start-group CNES::CNES CNES::AudioGen)
 
 if (NES)
-  target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
+  target_link_options(${PROJECT_NAME} PRIVATE
     -m ${CMAKE_BINARY_DIR}/map.txt
     -C ${CMAKE_CURRENT_SOURCE_DIR}/src/nes.cfg
-    --ld-args --dbgfile,${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.dbg
+    --ld-args --dbgfile,${CMAKE_BINARY_DIR}/${PROJECT_NAME}.dbg
   )
 else()
-  target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE -static)
+  target_link_libraries(${PROJECT_NAME} PRIVATE -static)
 endif()

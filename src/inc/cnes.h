@@ -2,6 +2,10 @@
 #ifndef CNES_H
 #define CNES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "common_types.h"
 
 /**
@@ -53,5 +57,9 @@ extern void runframe();
  * need to have branching logic to prevent slowdowns
  */
 extern bool late_frame;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // CNES_H

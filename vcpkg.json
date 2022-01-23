@@ -15,6 +15,9 @@
     {
       "name": "sdl2-mixer",
       "features": ["libvorbis"]
+    },
+    {
+      "name": "bgfx"
     }
   ]
 }

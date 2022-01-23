@@ -1,15 +1,15 @@
 if (NES)
-  set(module cnes.nes)
+  set(module cnes_nes)
 else()
-  set(module cnes.pc)
+  set(module cnes_pc)
 
   # find the dependencies from vcpkg
   find_package(SDL2 CONFIG REQUIRED)
   find_package(sdl2-mixer CONFIG REQUIRED)
-  find_library(LIBVORBIS vorbis REQUIRED)
-  find_library(LIBOGG ogg REQUIRED)
-  find_library(LIBVORBISENC vorbisenc REQUIRED)
-  find_library(LIBVORBISFILE vorbisfile REQUIRED)
+  find_package(bgfx CONFIG REQUIRED)
+
+  find_package(Vorbis CONFIG REQUIRED)
+  find_package(Ogg CONFIG REQUIRED)
 endif()
 
 
@@ -71,17 +71,24 @@ if (NES)
   )
   target_link_libraries(${module} INTERFACE ${module}_asmdefine ${module}_cdefine)
 else()
-
   add_library(${module} STATIC
-    pc/audio.c
-    pc/cnes_internal.h
-    pc/joypad.c
-    pc/renderer.c
-    pc/sdl.c
+    pc/audio.cpp
+    pc/audio.h
+    pc/core.cpp
+    pc/core.h
+    pc/joypad.cpp
+    pc/joypad.h
+    pc/renderer.cpp
+    pc/renderer.h
+    pc/sdl.cpp
     ${cnes_headers}
   )
-  target_link_libraries(${module} 
-    PRIVATE SDL2::SDL2main SDL2::SDL2-static SDL2::SDL2_mixer ${LIBVORBIS} ${LIBVORBISENC} ${LIBVORBISFILE} ${LIBOGG} ${module}_cdefine
+  set_property(TARGET ${module} PROPERTY CXX_STANDARD 11)
+  set_target_properties(${module} PROPERTIES LINKER_LANGUAGE CXX)
+  target_link_libraries(${module} PRIVATE 
+    SDL2::SDL2main SDL2::SDL2-static SDL2::SDL2_mixer Vorbis::vorbis Ogg::ogg
+    bgfx::bx bgfx::iqa bgfx::astc bgfx::bgfx
+    ${module}_cdefine
   )
 endif()
 

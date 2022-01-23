@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 # CNES library
-project(cnes LANGUAGES C ASM)
+project(cnes)
 
 if (NOT CNES_BUILD_SINGLE)
   # use external project add to build the application into separate subfolders
@@ -12,7 +12,7 @@ if (NOT CNES_BUILD_SINGLE)
   get_cmake_property(vars CACHE_VARIABLES)
   foreach(var ${vars})
     get_property(currentHelpString CACHE "${var}" PROPERTY HELPSTRING)
-    if("${var}" MATCHES "No help, variable specified on the command line." OR "${var}" MATCHES "CNES_")
+    if("${var}" MATCHES "No help, variable specified on the command line." OR "${var}" MATCHES "CNES_" OR "${var}" MATCHES "VCPKG_")
       # message("${var} = [${${var}}]  --  ${currentHelpString}") # uncomment to see the variables being processed
       list(APPEND CMDLINE_ARGS "-D${var}=${${var}}")
     endif()
