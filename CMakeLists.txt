@@ -51,6 +51,12 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "6502")
   set(NES ON CACHE BOOL "" FORCE)
 endif()
 
+if (NES)
+  enable_language(C ASM)
+else()
+  enable_language(C CXX)
+endif()
+
 option(CNES_BUILD_EXAMPLE "Builds the CNES example exe" OFF)
 
 add_subdirectory(src)

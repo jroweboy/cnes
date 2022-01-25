@@ -6,22 +6,22 @@ set(CMAKE_SYSTEM_PROCESSOR 6502)
 # Check for user provided CC65_PATH environment variable
 list(APPEND CMAKE_PREFIX_PATH $ENV{CC65_PATH})
 
-set(CMAKE_C_COMPILER cl65)
+find_program(_CL65 cl65)
+set(CMAKE_C_COMPILER ${_CL65})
 set(CMAKE_C_COMPILER_ID cc65)
-set(CMAKE_ASM_COMPILER cl65)
+set(CMAKE_ASM_COMPILER ${_CL65})
 set(CMAKE_ASM_COMPILER_ID ca65)
-set(CMAKE_LINKER ld65)
 
 find_program(_AR ar65)
 set(CMAKE_AR "${_AR}" CACHE FILEPATH "Archiver path override (prevents issues with cmake)")
 
-# 
+# Overridable default flag values.
 set(CC65_TARGET_FLAG "-t nes" CACHE STRING "Target flag for CC65")
 set(CC65_DEBUG_FLAG "-g -DDEBUG --asm-define DEBUG" CACHE STRING "Debug flags for CC65")
 set(CC65_OPT_MAX_FLAG "-Oisr" CACHE STRING "Max Optimization flags for CC65")
 set(CC65_OPT_MIN_SIZE "-O" CACHE STRING "Optimization flags for Min Size Build CC65")
 
-# Default compiler flags
+# Set default to the expected CMake variables
 set(CMAKE_ASM_FLAGS_INIT "${CC65_TARGET_FLAG}")
 set(CMAKE_ASM_FLAGS "${CC65_TARGET_FLAG}" CACHE STRING "" FORCE)
 set(CMAKE_ASM_FLAGS_DEBUG_INIT "${CC65_DEBUG_FLAG}")
@@ -44,7 +44,8 @@ set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL_INIT}" CACHE STRING "" 
 set(CMAKE_C_FLAGS_RELWITHDEBINFO_INIT "${CC65_OPT_MAX_FLAG} ${CC65_DEBUG_FLAG}")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO_INIT}" CACHE STRING "" FORCE)
 
-set(CMAKE_ASM_SOURCE_FILE_EXTENSIONS s;S;asm)
+# this is already the default
+#set(CMAKE_ASM_SOURCE_FILE_EXTENSIONS s;S;asm)
 
 # Change the C and ASM compile commands a bit to spit out a listing file
 # and also a .s file for the c as well (for nes debugging)
@@ -52,6 +53,9 @@ set(CMAKE_C_COMPILE_OBJECT
   "<CMAKE_C_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT>.s -S <SOURCE>"
   "<CMAKE_C_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -l <OBJECT>.lst -o <OBJECT> -c <OBJECT>.s"
 )
+# NOTE: if you do NOT enable the ASM and C languages, then cmake will not properly fill in the <INCLUDES>
+# template. It will leave off the `-I` flag causing compiler errors. Make sure you define your
+# project with `project(name LANGUAGES C ASM) or later call `enable_languages(C ASM)` for this to work
 set(CMAKE_ASM_COMPILE_OBJECT
   "<CMAKE_ASM_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -l <OBJECT>.lst -o <OBJECT> -c <SOURCE>"
 )

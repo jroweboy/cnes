@@ -2,6 +2,11 @@
 #ifndef CNES_JOYPAD_H
 #define CNES_JOYPAD_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "common_types.h"
 
 #define PAD_A       0x80
@@ -73,5 +78,10 @@ u8   __LIB_CALLSPEC player2_held(u8 button);
 #endif //CNES_DISABLE_JOYPAD_PLAYER2
 
 #endif //__NES__
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CNES_JOYPAD_H

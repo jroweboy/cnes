@@ -12,11 +12,14 @@ public:
 
   Renderer();
 
+  
+
 private:
-    SDL_Window* window = nullptr;
     bgfx::ProgramHandle program = BGFX_INVALID_HANDLE;
-    bgfx::VertexBufferHandle vbh = BGFX_INVALID_HANDLE;
-    bgfx::IndexBufferHandle ibh = BGFX_INVALID_HANDLE;
+    bgfx::ShaderHandle vs = BGFX_INVALID_HANDLE;
+    bgfx::ShaderHandle fs = BGFX_INVALID_HANDLE;
+    bgfx::UniformHandle scroll = BGFX_INVALID_HANDLE;
+    bgfx::TextureHandle palette = BGFX_INVALID_HANDLE;
 
     int width = 0;
     int height = 0;

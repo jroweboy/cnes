@@ -2,6 +2,10 @@
 #ifndef CNES_ENGINE_H
 #define CNES_ENGINE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "common_types.h"
 
 /**
@@ -19,5 +23,10 @@ extern void nmi_callback();
 extern void (*driver_nmi)(void);
 extern void (*driver_reset)(void);
 extern void (*driver_irq)(void);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CNES_ENGINE_H

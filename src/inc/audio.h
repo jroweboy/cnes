@@ -2,6 +2,10 @@
 #ifndef CNES_AUDIO_H
 #define CNES_AUDIO_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "common_types.h"
 
 #ifdef __NES__
@@ -51,5 +55,8 @@ void __LIB_CALLSPEC sfx_play(u8 sfx);
 
 #endif //__NES__
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CNES_AUDIO_H

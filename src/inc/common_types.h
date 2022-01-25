@@ -2,6 +2,11 @@
 #ifndef COMMON_TYPES_H
 #define COMMON_TYPES_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -28,6 +33,10 @@ typedef u16 coord;
 
 // If we aren't compiling for the NES then ignore __fastcall__ 
 #define __LIB_CALLSPEC 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif //COMMON_TYPES_H
