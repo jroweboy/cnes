@@ -2,7 +2,9 @@
 #include "cnes.h"
 #include "cnes_audio_gen.h"
 
-void init_callback() {}
+void init_callback() {
+    set_background(DARK + BLUE);
+}
 
 void runframe() {
     update_joypad();
