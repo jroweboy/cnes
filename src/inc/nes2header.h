@@ -141,9 +141,13 @@
   #define _NES2_CHRBRAM_SIZE (_NES2_LOGSIZE(0))
 #endif //NES2_CHRBRAM
 
-// CHRRAM size depends on if the mapper has CHRBRAM or CHR already defined 
+#ifdef NES2_CHRRAM
+  #define _NES2_CHRRAM_SIZE (_NES2_LOGSIZE(NES2_CHRRAM))
+#else
+  // CHRRAM size depends on if the mapper has CHRBRAM or CHR already defined 
 #define _NES2_CHRRAM_SIZE \
-  ((((_NES2_CHR_SIZE) + _NES2_CHR_SIZE_HI + (_NES2_CHRBRAM_SIZE)) > 0) ? 0 : 8192)
+  ((((_NES2_CHR_SIZE) + _NES2_CHR_SIZE_HI + (_NES2_CHRBRAM_SIZE)) > 0) ? 0 : _NES2_LOGSIZE(32768L))
+#endif
 
 // Battery bit is set if we have either BRAM or CHRBRAM
 #define _NES2_BATTERY_BIT \

@@ -7,9 +7,9 @@ extern "C" {
 #endif
 
 #include "common_types.h"
+#include "cnes_macros.h"
 
-
-extern u8* cnes_object_sprite;
+extern u8* cnes_object_metasprite;
 extern u8* cnes_object_x;
 extern u8* cnes_object_y;
 
@@ -37,7 +37,44 @@ enum ColorIntensity {
   PALE    = 0x20,
 };
 
-void __LIB_CALLSPEC set_background(u8 color);
+
+#ifdef __NES__
+  typedef u8 ColorSize;
+#else
+  typedef u32 ColorSize;
+#endif // __NES__
+
+extern ColorSize palette[32];
+extern volatile u8 vblank_tasks;
+ZP(vblank_tasks);
+
+#define set_bg_color(color_val) do { palette[0] = color_val; } while (0);
+
+#define set_tile_color(index, color_ptr) do { \
+    palette[(index * 4) + 1] = color_ptr[index + 0]; \
+    palette[(index * 4) + 2] = color_ptr[index + 1]; \
+    palette[(index * 4) + 3] = color_ptr[index + 2]; \
+  } while (0);
+
+#define set_sprite_color(index, color_ptr) do { \
+    palette[(index * 4) + 16 + 1] = color_ptr[index + 0]; \
+    palette[(index * 4) + 16 + 2] = color_ptr[index + 1]; \
+    palette[(index * 4) + 16 + 3] = color_ptr[index + 2]; \
+  } while (0);
+
+#define UPDATE_SPRITES (1 << 7)
+#define UPDATE_PALETTE (1 << 6)
+#define UPDATE_BACKGROUND (1 << 5)
+#define update_palette() do { vblank_tasks |= UPDATE_PALETTE; } while (0);
+
+void set_scroll_off();
+void set_scroll_horizontal();
+void set_scroll_vertical();
+void set_scroll_omni();
+
+void disable_rendering();
+void enable_rendering();
+void clear_screen();
 
 /**
  * @brief 
@@ -48,8 +85,15 @@ void __LIB_CALLSPEC draw_metasprite(u8 object_slot);
 /**
  * @brief 
  * 
+ * @param metatile_id 
  */
-void __LIB_CALLSPEC draw_metatile(u8 metatile_id);
+void __LIB_CALLSPEC load_metatile(u8 metatile_id);
+
+/**
+ * @brief 
+ * 
+ */
+void __LIB_CALLSPEC place_metatile(u8 metatile_id, u8 x, u8 y);
 
 
 #ifdef __cplusplus

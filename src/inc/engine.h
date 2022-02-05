@@ -14,16 +14,6 @@ extern "C" {
  */
 extern void irq_callback();
 
-/**
- * @brief User provided NMI callback
- * 
- */
-extern void nmi_callback();
-
-extern void (*driver_nmi)(void);
-extern void (*driver_reset)(void);
-extern void (*driver_irq)(void);
-
 
 #ifdef __cplusplus
 }

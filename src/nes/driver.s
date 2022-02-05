@@ -25,7 +25,7 @@ oam: .res 256
 wait_for_nmi:   .res 1
 next_frame:     .res 1
 
-.code
+.segment "CNES_DRIVER"
 
 
 ; Import user defined functions
@@ -82,13 +82,17 @@ next_frame:     .res 1
 
   ldx #0
   stx $a000 ; Vertical mirroring
+  
+  ; Setup the user code in PRGA bank 0 by default
+  BANK_PRGA 0
+  BANK_PRGC 1
 
   lda #1
   sta nmi_lock
   
   jsr InitMusic
   jsr InitEngine
-  
+
   jsr _init_callback
 
   ; NES is initialized, ready to begin!
@@ -99,17 +103,19 @@ next_frame:     .res 1
   ; endless loop
 .endproc
 
-.import UpdateMusic
+.import UpdateMusic, DrawingNMICallback
 .export _driver_nmi:=HandleNMI
 .proc HandleNMI
   pha
     lda PPUSTATUS       ; Clear the NMI flag
     lda nmi_lock
     beq EarlyExit
-    ; save registers. A was already saved above
+    ; save registers. A was already saved above.
+    txa
     pha
+    tya
     pha
-      ; jsr DrawingNMICallback
+      jsr DrawingNMICallback
       ; jsr PrepareNextScreen
       jsr UpdateMusic
       lda #1
@@ -117,7 +123,9 @@ next_frame:     .res 1
       sta nmi_lock
     ; restore registers and return
     pla
+    tay
     pla
+    tax
 EarlyExit:
   pla
   rti

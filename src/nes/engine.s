@@ -32,7 +32,8 @@ bankc:          .res 1
 .export banka, bankc
 
 irq_scanline:   .res 1
-.code
+
+.segment "CNES_ENGINE"
 
 .export InitEngine
 .proc InitEngine

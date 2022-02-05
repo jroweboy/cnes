@@ -32,6 +32,9 @@ extern "C" {
 #include "audio.h"
 #endif //CNES_DISABLE_AUDIO
 
+/// Helpers for fast jump tables and other state management
+#include "state.h"
+
 /// Driver code (handles game initialization)
 
 /**
@@ -40,6 +43,7 @@ extern "C" {
  * start drawing the first background to the screen.
  */
 extern void init_callback();
+
 
 /**
  * @brief User provided callback, expected to run one frame of game logic.
@@ -59,7 +63,24 @@ extern void runframe();
 extern bool late_frame;
 
 
+/**
+ * @brief User provided NMI callback
+ * 
+ */
+extern void nmi_callback();
+
+
 #ifdef __NES__
+
+/**
+ * @brief Pointers to the routines that will run the Reset, NMI, IRQ.
+ * Ideally they will just be set to the provided functions, but if you need
+ * more control you can change them (be sure that the native export accounts for
+ * your new additions though)
+ */
+extern void (*driver_nmi)(void);
+extern void (*driver_reset)(void);
+extern void (*driver_irq)(void);
 
 /**
  * @brief Define temporary register variables that can be used to pass data between ASM
@@ -83,22 +104,8 @@ extern u8 R13;
 extern u8 R14;
 extern u8 R15;
 
-#pragma zpsym ("R0");
-#pragma zpsym ("R1");
-#pragma zpsym ("R2");
-#pragma zpsym ("R3");
-#pragma zpsym ("R4");
-#pragma zpsym ("R5");
-#pragma zpsym ("R6");
-#pragma zpsym ("R7");
-#pragma zpsym ("R8");
-#pragma zpsym ("R9");
-#pragma zpsym ("R10");
-#pragma zpsym ("R11");
-#pragma zpsym ("R12");
-#pragma zpsym ("R13");
-#pragma zpsym ("R14");
-#pragma zpsym ("R15");
+ZP(R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15);
+
 #endif // __NES__
 
 

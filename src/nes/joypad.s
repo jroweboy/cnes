@@ -32,7 +32,7 @@ p2_held: .res 8
 .endif ;CNES_DISABLE_JOYPAD_HELD
 .endif ;CNES_DISABLE_JOYPAD_PLAYER2
 
-.code
+.segment "CNES_JOYPAD"
 
 .macro MacroCheckHeld player
 .scope

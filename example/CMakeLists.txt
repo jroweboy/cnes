@@ -1,11 +1,13 @@
 
-cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 project(cnes_example LANGUAGES C ASM)
 
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   find_package(CNES REQUIRED)
 endif()
+
+set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 if (NES)
   set(platform_srcs
@@ -29,9 +31,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE -Wl,--start-group CNES::CNES CNES:
 
 if (NES)
   target_link_options(${PROJECT_NAME} PRIVATE
-    -m ${CMAKE_BINARY_DIR}/map.txt
     -C ${CMAKE_CURRENT_SOURCE_DIR}/src/nes.cfg
-    --ld-args --dbgfile,${CMAKE_BINARY_DIR}/${PROJECT_NAME}.dbg
+    -m $<TARGET_FILE_DIR:${PROJECT_NAME}>/map.txt
+    --ld-args --dbgfile,$<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}.dbg
   )
 else()
   target_link_libraries(${PROJECT_NAME} PRIVATE -static)

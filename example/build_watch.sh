@@ -10,7 +10,7 @@
         then
             # clear;
             echo '================= Building ================='
-            if (cd build/; ninja); then
+            if (cmake --build --preset default); then
                 echo "build success"
             else
                 echo "build failed"

@@ -25,7 +25,7 @@ sfx_id:           .res 1
 .import MusicAddrHi, MusicAddrLo, MusicBank_A, MusicBank_C
 .import SFXAddrHi, SFXAddrLo, SFXId
 
-.code
+.segment "CNES_AUDIO"
 
 .macro MacroSetMusicBank
   BANK_PRGA music_banka
@@ -73,11 +73,7 @@ sfx_id:           .res 1
   sta music_current
   lda #0
   sta sfx_queue
-
-  ; By default, load the init with the first song in the music list
-  ldx #0
-  jmp LoadMusicProject
-  ;rts
+  rts
 .endproc
 
 .macro MacroMusicUpdate

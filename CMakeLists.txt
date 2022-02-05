@@ -52,7 +52,7 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "6502")
 endif()
 
 if (NES)
-  enable_language(C ASM)
+  enable_language(ASM C)
 else()
   enable_language(C CXX)
 endif()

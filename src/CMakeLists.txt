@@ -63,12 +63,22 @@ if (NES)
   add_library(${module} STATIC
     nes/audio.s
     nes/common.inc
+    nes/drawing.s
     nes/driver.s
     nes/engine.s
     nes/joypad.s
-    nes/nes.c
+
+    # p8crt65 - for popslide and nstripe using PB8 
+    # see https://wiki.nesdev.org/w/index.php/Tile_compression
+    nes/p8crt65/src/popslide.inc
+    nes/p8crt65/src/popslideinternal.inc
+    nes/p8crt65/src/popslide16.s
+    nes/p8crt65/src/nstripe.s
+
     ${cnes_headers}
   )
+
+  target_include_directories(${module} PRIVATE nes/p8crt65/src)
   target_link_libraries(${module} INTERFACE ${module}_asmdefine ${module}_cdefine)
 else()
   add_library(${module} STATIC

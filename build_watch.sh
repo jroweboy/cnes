@@ -1,6 +1,6 @@
 #!/bin/env sh
 
-tools/Windows/inotifywait.exe -m -r ./src/ ./inc/ ./Makefile | 
+tools/Windows/inotifywait.exe -m -r ./src ./example ./CMakeLists.txt | 
     while read -r date time dir file;
         do
         flag=$((1-flag))
@@ -10,7 +10,7 @@ tools/Windows/inotifywait.exe -m -r ./src/ ./inc/ ./Makefile |
         then
             # clear;
             echo '================= Building ================='
-            if (cd build/; ninja); then
+            if (cmake --build --preset default --config RelWithDebInfo); then
                 echo "build success"
             else
                 echo "build failed"

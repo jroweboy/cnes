@@ -50,6 +50,8 @@
         "tuple": "cpp",
         "type_traits": "cpp",
         "typeinfo": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "nes2header.h": "c",
+        "cnes_audio_gen.h": "c"
     }
 }

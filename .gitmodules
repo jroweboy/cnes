@@ -1,3 +1,6 @@
 [submodule "vcpkg"]
 	path = vcpkg
 	url = https://github.com/microsoft/vcpkg
+[submodule "src/nes/p8crt65"]
+	path = src/nes/p8crt65
+	url = git@github.com:jroweboy/p8crt65.git

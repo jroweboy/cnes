@@ -105,4 +105,7 @@ void __LIB_CALLSPEC music_stop() {
 void __LIB_CALLSPEC sfx_play(u8 sfx) {
   core->audio.sfx_play(sfx);
 }
+
+// DRAWING
+
 }

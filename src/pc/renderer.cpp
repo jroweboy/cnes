@@ -31,3 +31,8 @@ Renderer::Renderer() {
 
 
 }
+
+extern "C" {
+  ColorSize palette[32];
+  volatile u8 vblank_tasks;
+}
