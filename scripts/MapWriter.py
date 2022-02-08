@@ -6,6 +6,7 @@
 
 import os, sys, math
 import struct, base64, zlib
+from pathlib import Path
 
 from PIL import Image
 from xml.dom.minidom import Document
@@ -28,7 +29,7 @@ class Tileset:
         """
         TileImage = Image.open(self.Filename).convert("RGB")
         TileIW, TileIH = TileImage.size
-        TilesetW, TilesetH = TileIW / self.TileWidth, TileIH / self.TileHeight
+        TilesetW, TilesetH = TileIW // self.TileWidth, TileIH // self.TileHeight
 
         for y in range(TilesetH):
             for x in range(TilesetW):
@@ -36,17 +37,17 @@ class Tileset:
                 tile = TileImage.crop(box)
                 self.List.append(tile)
 
-                str = tile.tostring()
-                if not self.TileDict.has_key(str):
-                    self.TileDict[str] = len(self.List) - 1
+                s = str(list(tile.getdata()))
+                if not s in self.TileDict:
+                    self.TileDict[s] = len(self.List) - 1
 
     def findTile(self, tileImage):
         """ This method returns the tile index for the given tile image if it is part of this tileset,
             and returns 0 if the tile could not be found. Constant complexity due to dictionary lookup.
         """
-        str = tileImage.tostring()
-        if self.TileDict.has_key(str):
-            return self.TileDict[str] + 1
+        s = str(list(tileImage.getdata()))
+        if s in self.TileDict:
+            return self.TileDict[s] + 1
         else:
             return 0
 
@@ -68,7 +69,7 @@ class TileMap:
         """
         MapImage = Image.open(mapImageFile).convert("RGB")
         MapImageWidth, MapImageHeight = MapImage.size
-        self.Width, self.Height = MapImageWidth / self.TileWidth, MapImageHeight / self.TileHeight
+        self.Width, self.Height = MapImageWidth // self.TileWidth, MapImageHeight // self.TileHeight
         progress = -1
 
         for y in range(self.Height):
@@ -81,16 +82,7 @@ class TileMap:
                 p = ((x + y * self.Width) * 100) / (self.Width * self.Height)
                 if progress != p:
                     progress = p
-                    self.printProgress(progress)
-
-        self.printProgress(100)
-
-    def printProgress(self, percentage):
-        """ This function prints the percentage on the current row after erasing what is already there.
-        """
-        print('%s\r' % ' '*20,)       # clean up row
-        print('%3d%% ' % percentage,) # ending with comma prevents newline from being appended
-        sys.stdout.flush()
+        print("Completed reading map.")
 
     def write(self, fileName):
         doc = Document()
@@ -111,16 +103,16 @@ class TileMap:
         tileset.appendChild(image)
         map.appendChild(tileset)
         layer = doc.createElement("layer")
-        layer.setAttribute("name", "Ground")
+        layer.setAttribute("name", "background")
         layer.setAttribute("width", str(self.Width))
         layer.setAttribute("height", str(self.Height))
         data = doc.createElement("data")
 
         data.setAttribute("encoding", "base64")
-        TileData = ""
+        TileData = b""
         for tileId in self.List:
             TileData = TileData + struct.pack("<l", tileId)  # pack the tileId into a long
-        b64data = doc.createTextNode(base64.b64encode(TileData))
+        b64data = doc.createTextNode(base64.b64encode(TileData).decode("utf-8"))
         data.appendChild(b64data)
 
         layer.appendChild(data)
@@ -129,6 +121,7 @@ class TileMap:
         file = open(fileName, "w")
         file.write(doc.toprettyxml(indent = " "))
         file.close()
+        print("Completed writing tmx.")
 
 if __name__ == "__main__":
   if sys.argv[1] == "--help":
@@ -140,6 +133,6 @@ if __name__ == "__main__":
       print("Example: python MapWriter.py 8 8 JansHouse.png JansHouse-Tileset.png")
   else:
       tileX, tileY = int(sys.argv[1]), int(sys.argv[2])
-      mapImageFile, tileImageFile = sys.argv[3], sys.argv[4]
+      mapImageFile, tileImageFile = str(Path(sys.argv[3]).resolve()), str(Path(sys.argv[4]).resolve())
       map = TileMap(mapImageFile, Tileset(tileImageFile, tileX, tileY), tileX, tileY)
       map.write(os.path.splitext(mapImageFile)[0] + ".tmx")

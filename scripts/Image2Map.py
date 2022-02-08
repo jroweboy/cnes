@@ -20,7 +20,7 @@ class TileMap:
         print("Opening the map image file: " + file)
         self.MapImage = Image.open(file)
         self.MapImageWidth, self.MapImageHeight = self.MapImage.size
-        self.Width, self.Height = self.MapImageWidth / self.TileX, self.MapImageHeight / self.TileY
+        self.Width, self.Height = self.MapImageWidth // self.TileX, self.MapImageHeight // self.TileY
 
         # Store the unique tiles in a list and a hash, and the map in a list.
         self.MapList, self.TileList, self.TileDict = self.parseMap()
@@ -35,8 +35,8 @@ class TileMap:
         # Extract maximal components from G into the dictionary TileMap, and combine them
         # into self.FullTileMap using a method that places them as close to each other as
         # possible.
-        while self.G.nodes() != []:
-            v = self.G.nodes()[0]
+        while len(self.G.nodes) > 0:
+            v = list(self.G.nodes)[0]
             TileMap, K = self.growTileMap({(0, 0): v}, self.G, 0, 0, v)
             self.FullTileMap = self.composeDictionaries(self.FullTileMap, TileMap)
             self.G.remove_nodes_from(TileMap.values())
@@ -66,9 +66,9 @@ class TileMap:
             for x in range(self.Width):
                 box = self.TileX * x, self.TileY * y, self.TileX * (x+1), self.TileY * (y+1)
                 tile = self.MapImage.crop(box)
-                s = tile.tostring()
+                s = str(list(tile.getdata()))
 
-                if TDict.has_key(s):
+                if s in TDict:
                     MList[y][x] = TDict[s]
                 else:
                     TList.append(tile)
@@ -79,19 +79,9 @@ class TileMap:
                 p = ((x + y * self.Width) * 100) / (self.Width * self.Height)
                 if progress != p:
                     progress = p
-                    self.printProgress(progress)
-
-        self.printProgress(100)
         print("Done!")
 
         return MList, TList, TDict
-
-    def printProgress(self, percentage):
-        """ This function prints the percentage on the current row after erasing what is already there.
-        """
-        print('%s\r' % ' '*20,)       # clean up row
-        print('%3d%% ' % percentage,) # ending with comma prevents newline from being appended
-        sys.stdout.flush()
 
     def getTileImage(self):
         """ This function takes the hash of unique tiles self.FullTileMap and
@@ -162,17 +152,12 @@ class TileMap:
                         +1 for left -> right
                         -1 for up   -> down
         """
-
-        if self.G.has_edge(s, t):
-            values = [ value for value in self.G.edge[s][t] if (dirr * value) > 0 ]
+        if self.G.has_edge(s, t, dirr):
+            new_tally = self.G.edges[s,t,dirr]
         else:
-            values = []
+            new_tally = 1
 
-        if values:
-            self.G.remove_edge(s, t, values[0])    # increase the value by 1
-            self.G.add_edge(s, t, values[0] + dirr)
-        else:
-            self.G.add_edge(s, t, dirr)             # create a dir-valued edge
+        self.G.add_edge(s, t, key=dirr, tally=new_tally)
 
     def graphFromList(self):
         """ This function constructs a weighted directed graph from the 
@@ -202,17 +187,17 @@ class TileMap:
                 p = ((j + i * len(L)) * 100) / (len(L) * len(L[0]))
                 if progress != p:
                     progress = p
-                    self.printProgress(progress)
+                    # self.printProgress(progress)
 
         # What remains is the bottom and right line of edges:
         for j in range(len(L[0]) - 1):
-            self.addEdge(L[len(L) - 1][j], L[len(L) - 1][j + 1],  1)
+            self.addEdge(L[len(L) - 1][j], L[len(L) - 1][j + 1], 1)
 
         for i in range(len(L) - 1):
             self.addEdge(L[i][len(L[0]) - 1], L[i + 1][len(L[0]) - 1], -1)
 
         # Now show 100% progress and say we're done.
-        self.printProgress(100)
+        # self.printProgress(100)
         print("Done!")
 
 
@@ -239,7 +224,7 @@ class TileMap:
         # also embed blocks of tiles that appear only in one configuration
         # (pictures chopped up in tiles).
         dir = [ [ Edges[i], i ] for i in range(4)]
-        dir.sort(cmp = lambda L1, L2: len(L1[0]) - len(L2[0]))
+        dir.sort(key = lambda L: len(L[0]))
         dir = [ x[1] for x in dir]
 
         while dir != []:
@@ -252,7 +237,7 @@ class TileMap:
                 # make the algorithm start with a combination that appears most
                 # often in the graph, which is a measure for how much two tiles
                 # "belong together".
-                E.sort(cmp = lambda e, f: abs(e[1]) - abs(f[1]), reverse = True)
+                E.sort(key = lambda e: abs(e[1]), reverse = True)
 
                 # Now walk through E until you find an edge that fits with
                 # the previously placed tiles in TileMap
@@ -277,7 +262,7 @@ class TileMap:
                     # Now in case position NX, NY is not already taken and endV is
                     # compatible with "surrounding edges" in our graph, then we can
                     # add endV to our TileMap.
-                    if  (not (NY, NX) in TileMap) and (TileMap.values().count(endV) == 0) and \
+                    if  (not (NY, NX) in TileMap) and (list(TileMap.values()).count(endV) == 0) and \
                         ( (not (NY-1, NX) in TileMap) or G.has_edge(TileMap[(NY-1, NX)], endV) ) and \
                         ( (not (NY, NX+1) in TileMap) or G.has_edge(endV, TileMap[(NY, NX+1)]) ) and \
                         ( (not (NY+1, NX) in TileMap) or G.has_edge(endV, TileMap[(NY+1), NX]) ) and \
@@ -329,15 +314,15 @@ class TileMap:
         while foundFit == False:
             # We check if H2 can be placed at location (CX1 + X, CY1 + Y)
             isFit = True
-            keys = H2.keys()
+            keys = list(H2.keys())
 
             # As long as there are keys in H2 left and we found no counter example:
             while keys != [] and isFit:
                 (y, x) = keys.pop()
                 x1, y1 = x - CX2 + CX1 + X, y - CY2 + CY1 + Y
 
-                if H1.has_key((y1, x1)) or H1.has_key((y1 - 1, x1)) or H1.has_key((y1, x1 + 1)) or \
-                   H1.has_key((y1 + 1, x1)) or H1.has_key((y1, x1 - 1)):
+                if (y1, x1) in H1 or (y1 - 1, x1) in H1 or (y1, x1 + 1) in H1 or \
+                   (y1 + 1, x1) in H1 or (y1, x1 - 1) in H1:
                     isFit = False
 
             # If we found a fit, embed H2 into H1 accordingly.
@@ -362,22 +347,24 @@ class TileMap:
 
         return H1
 
-if sys.argv[1] == "--help":
-    print("Usage  : python Image2Map.py [tileX] [tileY] files...")
-    print("Example: python Image2Map.py 8 8 Sewers.png Caves.png")
-elif len(sys.argv) < 4:
-    print("Error  : You specified too few arguments!\n")
-    print("Usage  : python Image2Map.py [tileX] [tileY] files...")
-    print("Example: python Image2Map.py 8 8 Sewers.png Caves.png")
-else:
-    tileX, tileY = int(sys.argv[1]), int(sys.argv[2])
+if __name__ == "__main__":
+    
+    if sys.argv[1] == "--help":
+        print("Usage  : python Image2Map.py [tileX] [tileY] files...")
+        print("Example: python Image2Map.py 8 8 Sewers.png Caves.png")
+    elif len(sys.argv) < 4:
+        print("Error  : You specified too few arguments!\n")
+        print("Usage  : python Image2Map.py [tileX] [tileY] files...")
+        print("Example: python Image2Map.py 8 8 Sewers.png Caves.png")
+    else:
+        tileX, tileY = int(sys.argv[1]), int(sys.argv[2])
 
-    for file in sys.argv[3:]:
-        map = TileMap(file, tileX, tileY)
+        for file in sys.argv[3:]:
+            map = TileMap(file, tileX, tileY)
 
-        tilefile = os.path.splitext(file)[0] + "-Tileset" + ".png"
-        print("Saving the tileset image into the file: " + tilefile)
-        map.TileImage.save( tilefile, "PNG" )
+            tilefile = os.path.splitext(file)[0] + "-Tileset" + ".png"
+            print("Saving the tileset image into the file: " + tilefile)
+            map.TileImage.save( tilefile, "PNG" )
 
-        print("Pretty-printing the tileset:" + "\n")
-        map.printHash(map.FullTileMap)
+            print("Pretty-printing the tileset:" + "\n")
+            map.printHash(map.FullTileMap)

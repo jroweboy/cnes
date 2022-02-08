@@ -3,18 +3,62 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "maps/test.tmx",
+    "activeFile": "maps/title_screen.tmx",
     "expandedProjectPaths": [
         "maps"
     ],
+    "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
+        "": {
+            "scaleInEditor": 1
+        },
+        "maps/nametable.tmx": {
+            "scale": 3.5902083333333334,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 128.12626936691234,
+                "y": 120.04874368943307
+            }
+        },
+        "maps/nametable.tmx#C:/dev/cnes/example/assets/maps/title_screen_tileset": {
+            "scaleInDock": 1
+        },
         "maps/test.tmx": {
             "scale": 4,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 109.75,
-                "y": 149.25
+                "x": 31.375,
+                "y": 113
             }
+        },
+        "maps/test.tmx#title_screen_tileset": {
+            "scaleInDock": 3
+        },
+        "maps/title_screen.tmx": {
+            "scale": 2,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 196,
+                "y": 123.5
+            }
+        },
+        "maps/title_screen.tmx#./example/assets/maps/title_screen-Tileset": {
+            "scaleInDock": 1
+        },
+        "maps/title_screen.tmx#./example/assets/maps/title_screen_tileset": {
+            "scaleInDock": 1
+        },
+        "maps/title_screen.tmx#C:/dev/cnes/example/assets/maps/scratch/title_screen_tileset": {
+            "scaleInDock": 1
+        },
+        "maps/title_screen.tmx#C:/dev/cnes/example/assets/maps/title_screen-Tileset": {
+            "scaleInDock": 1
+        },
+        "maps/title_screen.tmx#C:/dev/cnes/example/assets/maps/title_screen_tileset": {
+            "scaleInDock": 1
+        },
+        "maps/title_screen.tmx#title_screen-Tileset": {
+            "scaleInDock": 2
         }
     },
     "last.imagePath": "C:/dev/cnes/example/assets/maps",
@@ -24,11 +68,14 @@
     "map.tileWidth": 8,
     "map.width": 32,
     "openFiles": [
-        "maps/test.tmx"
+        "maps/test.tmx",
+        "maps/title_screen.tmx"
     ],
     "project": "",
     "recentFiles": [
-        "maps/test.tmx"
+        "maps/title_screen.tmx",
+        "maps/test.tmx",
+        "maps/nametable.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {
