@@ -22,10 +22,15 @@ extern "C" {
 #include "joypad.h"
 #endif //CNES_DISABLE_JOYPAD
 
-/// Provides high level drawing functionality
+/// Provides low level drawing functionality
 #ifndef CNES_DISABLE_DRAWING
 #include "drawing.h"
 #endif //CNES_DISABLE_DRAWING
+
+/// Provides high level tile map loading tools
+#ifndef CNES_DISABLE_TILEMAP
+#include "tilemap.h"
+#endif //CNES_DISABLE_TILEMAP
 
 /// Engine provides audio through famistudio.
 #ifndef CNES_DISABLE_AUDIO

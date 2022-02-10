@@ -10,6 +10,7 @@
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "maps/nametable.tmx": {
@@ -71,7 +72,7 @@
         "maps/test.tmx",
         "maps/title_screen.tmx"
     ],
-    "project": "",
+    "project": "example.tiled-project",
     "recentFiles": [
         "maps/title_screen.tmx",
         "maps/test.tmx",

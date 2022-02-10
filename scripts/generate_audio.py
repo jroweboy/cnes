@@ -5,6 +5,7 @@
 
 import argparse
 import functools
+from importlib.resources import path
 import os
 import pathlib
 import shutil
@@ -13,6 +14,9 @@ import sys
 
 # debugging
 import inspect
+
+# local
+from bin2h import bin2h
 
 def fm(*args, famistudio_path):
   cmd = [famistudio_path, *args]
@@ -26,9 +30,7 @@ def fm(*args, famistudio_path):
   print(f"FamiStudio CMD ({' '.join(cmd)}) output:\n{done}")
   return done.stdout
 
-def export_engine(fin, fout, famistudio_path=None):
-  fin = pathlib.Path(fin).resolve()
-  fout = pathlib.Path(fout).resolve()
+def export_engine(fin, fout, famistudio_path):
   project_name = fin.stem
   # export the engine to a single file to get the list of all the songs
   # that way we can split the sfx songs from the music songs
@@ -39,7 +41,7 @@ def export_engine(fin, fout, famistudio_path=None):
     "-famistudio-generate-list", famistudio_path=famistudio_path)
   song_indicies = []
   sfx_indicies = []
-  with open(f"{fout}/all_project_songlist.inc", 'r') as file:
+  with open(fout / "all_project_songlist.inc", 'r') as file:
     data = file.read().splitlines()
     for line in data:
       if line.startswith("song_max"):
@@ -49,9 +51,9 @@ def export_engine(fin, fout, famistudio_path=None):
       elif line.startswith('song_'):
         song_indicies += [line[line.rfind(" ")+1:]]
 
-  os.remove(f"{fout}/all_project_songlist.inc")
-  os.remove(f"{fout}/all_project.dmc")
-  os.remove(f"{fout}/all_project.s")
+  os.remove(str(fout / "all_project_songlist.inc"))
+  os.remove(str(fout / "all_project.dmc"))
+  os.remove(str(fout / "all_project.s"))
 
   print(f"Exporting NES SFX (project indicies: {sfx_indicies})")
   print(fm(str(fin),
@@ -62,10 +64,10 @@ def export_engine(fin, fout, famistudio_path=None):
     "-famistudio-sfx-generate-list", famistudio_path=famistudio_path))
 
   # FIXUP: replace `sounds` inside the sfx file with a project specific name
-  with open(f"{fout}/{project_name}_sfx.s", 'r') as f:
+  with open(fout / f"{project_name}_sfx.s", 'r') as f:
     s = f.read()
   s = s.replace("sounds", f"{project_name}_sfx")
-  with open(f"{fout}/{project_name}_sfx.s", 'w') as f:
+  with open(fout / f"{project_name}_sfx.s", 'w') as f:
     f.write(s)
 
   print(f"Exporting NES songs (project indicies: {song_indicies})")
@@ -79,46 +81,13 @@ def export_engine(fin, fout, famistudio_path=None):
     "-famistudio-asm-format:ca65",
     "-famistudio-generate-list", famistudio_path=famistudio_path)
 
-def bin2h(fin):
-  '''Generates a C header file from a binary file.'''
-  fin = pathlib.Path(fin).resolve()
-  var_name = fin.name.replace(".", "_").replace(" ", "_")
-  fout = fin.with_suffix(fin.suffix+'.h')
-  with open(fin, 'rb') as input:
-    with open(fout, 'w') as output:
-      data_len = 0
-      output.write(f'''
-// Generated from {fin.name} by bin2header (python impl)
-unsigned char {var_name}[] = {{
-''')
-      # writes the previous line ending after the next line is read
-      # so we don't end up with a trailing comma
-      write_line_ending = False
-      while True:
-        data = input.read(1024 * 1024)
-        if not data:
-          break
-        data_len += len(data)
-        lines = [data[i:i+16] for i in range(0, len(data), 16)]
-        for line in lines:
-          if write_line_ending:
-            output.write(f',\n')
-          line = ','.join([f"0x{byte:02x}" for byte in line])
-          output.write(f'{line}')
-          write_line_ending = True
-      output.write(f'}};\n')
-      output.write(f"unsigned int {var_name}_len = {data_len};\n")
-
-def export_ogg(fin, fout, famistudio_path=None):
-  fin = pathlib.Path(fin).resolve()
-  fout = pathlib.Path(fout).resolve()
+def export_ogg(fin: pathlib.Path, fout:pathlib.Path, famistudio_path:pathlib.Path):
   return fm(str(fin),
     "ogg-export",
     f"{fout}/{fin.stem}.ogg", famistudio_path=famistudio_path)
 
 def generate_pc(fin, fout, famistudio_path=None):
-  fin = pathlib.Path(fin).resolve()
-  fout = pathlib.Path(f"{fout}/pc/audio/").resolve()
+  pcout = fout / "pc" / "audio"
   
   define = []
   include = []
@@ -127,8 +96,8 @@ def generate_pc(fin, fout, famistudio_path=None):
   for i, file in enumerate(fin.rglob('*.fms')):
     song = file.stem
     print(f"Exporting PC audio track {file.stem} and converting to C header")
-    export_ogg(file, fout, famistudio_path)
-    bin2h(f"{fout}/{song}.ogg")
+    export_ogg(file, pcout, famistudio_path)
+    bin2h(pcout / f"{song}.ogg")
     include += [f'#include "./{song}.ogg.h"']
     song_list += [f'{song}_ogg']
     song_list_len += [f'sizeof({song}_ogg)']
@@ -137,7 +106,7 @@ def generate_pc(fin, fout, famistudio_path=None):
   song_len = len(song_list)
   song_list = ',\n'.join(song_list)
   song_list_len = ',\n'.join(song_list_len)
-  with open(f"{fout}/cnes_pc_audio_gen_internal.c", 'w') as f:
+  with open(pcout / "cnes_pc_audio_gen_internal.c", 'w') as f:
     f.write(f'''
 {include}
 
@@ -153,7 +122,7 @@ const unsigned int cnes_song_len[] = {{
 ''')
 
   define = '\n'.join(define)
-  with open(f"{fout}/cnes_pc_audio_gen_internal.h", 'w') as f:
+  with open(pcout / "cnes_pc_audio_gen_internal.h", 'w') as f:
     f.write(f'''
 #ifndef __CNES_PC_AUDIO_H
 #define __CNES_PC_AUDIO_H
@@ -164,19 +133,18 @@ const unsigned int cnes_song_len[] = {{
 ''') 
 
 
-def generate_engine(fin, fout, famistudio_path=None):
+def generate_engine(fin, fout, famistudio_path):
   '''Builds the asm module that should be linked with the build to provide audio
   This builds from all the FMS provided in the input directory.'''
 
-  fin = pathlib.Path(fin).resolve()
-  fout = pathlib.Path(f"{fout}/nes/audio/").resolve()
-  file_path = os.path.abspath(os.path.dirname(__file__))
+  nesout = fout / "nes" / "audio"
+  template_path = pathlib.Path(os.path.abspath(os.path.dirname(__file__)))
   config = set()
   segments = set()
 
   for file in fin.rglob('*.fms'):
     project_name = file.stem
-    cmd_output = export_engine(str(file), fout, famistudio_path)
+    cmd_output = export_engine(file, nesout, famistudio_path)
     if not cmd_output:
       continue
     print (cmd_output)
@@ -208,7 +176,7 @@ def generate_engine(fin, fout, famistudio_path=None):
   song_data = []
   songs = []
   define = []
-  for i, file in enumerate(fout.rglob('*_songlist.inc')):
+  for i, file in enumerate(nesout.rglob('*_songlist.inc')):
     with open(file) as f:
       songs += [file.stem[0:file.stem.find("_songlist")]]
       song_name = f.read().splitlines()[0]
@@ -246,23 +214,23 @@ SFXAddrLo:   .byte {song_data['sfxlo']}"""
 
   # now load the .s files for each of the songs to find the dmc sound effects
   for song in songs:
-    with open(f"{fout}/{song}.s", 'r') as file:
+    with open(nesout / f"{song}.s", 'r') as file:
       template = file.read()
 
   # write the data to the template file
-  with open(f"{file_path}/audio_engine_template.s", 'r') as file:
+  with open(template_path / "nes_audio_template.s", 'r') as file:
     template = file.read()
-  with open(f"{file_path}/famistudio_ca65.s", 'r') as file:
+  with open(template_path / "famistudio_ca65.s", 'r') as file:
     engine = file.read()
   template = template.replace("{famistudio_segment_code}", '\n'.join(segments))
   template = template.replace("{famistudio_music_list}", song_data_template)
   template = template.replace("{famistudio_config_options}", '\n'.join(config))
   template = template.replace("{famistudio_engine_code}", engine)
 
-  with open(f"{fout}/cnes_nes_audio_gen_internal.s", 'w') as file:
+  with open(nesout / "cnes_nes_audio_gen_internal.s", 'w') as file:
     file.write(template)
   define = '\n'.join(define)
-  with open(f"{fout}/cnes_nes_audio_gen_internal.h", 'w') as f:
+  with open(nesout / "cnes_nes_audio_gen_internal.h", 'w') as f:
     f.write(f'''
 #ifndef __CNES_NES_AUDIO_H
 #define __CNES_NES_AUDIO_H
@@ -273,39 +241,30 @@ SFXAddrLo:   .byte {song_data['sfxlo']}"""
 ''')
 
 def create_dir_if_missing(d):
-  pathlib.Path(d).mkdir(parents=True, exist_ok=True)
+  d.mkdir(parents=True, exist_ok=True)
 
-def main():
-  parser = argparse.ArgumentParser(description='Processes Famistudio audio and outputs to NES and SDL formats')
-  
-  parser.add_argument('-a', '--all', action="store_true")
-  parser.add_argument('-n', '--nes', action="store_true")
-  parser.add_argument('-p', '--pc', action="store_true")
-  parser.add_argument('-F', '--famistudio-path', type=str,
-                      help='Path to the famistudio executable''')
-  parser.add_argument('fin', metavar='in', type=str,
-                      help='Input Directory of fms files to build the song data from')
-  parser.add_argument('fout', metavar='out', type=str,
-                      help='Build Directory to write the output files to.')
-                      
-  args = parser.parse_args()
-  create_dir_if_missing(args.fout)
-  create_dir_if_missing(f"{args.fout}/nes/audio")
-  create_dir_if_missing(f"{args.fout}/pc/audio")
-  create_dir_if_missing(f"{args.fout}/inc")
-  
-  if (args.all):
-    generate_pc(args.fin, args.fout, args.famistudio_path)
-    generate_engine(args.fin, args.fout, args.famistudio_path)
-  elif (args.nes):
-    generate_engine(args.fin, args.fout, args.famistudio_path)
-  elif (args.pc):
-    generate_pc(args.fin, args.fout, args.famistudio_path)
-  else:
-    generate_pc(args.fin, args.fout, args.famistudio_path)
-    generate_engine(args.fin, args.fout, args.famistudio_path)
+def main(fami_path, infile, outfile, build=None):
+  fin = pathlib.Path(infile).resolve()
+  fout = pathlib.Path(outfile).resolve()
+  fami = pathlib.Path(fami_path).resolve()
 
-  with open(f"{args.fout}/inc/cnes_audio_gen.h", 'w') as f:
+  create_dir_if_missing(fout)
+  create_dir_if_missing(fout / "nes" / "audio")
+  create_dir_if_missing(fout / "pc" / "audio")
+  create_dir_if_missing(fout / "inc")
+  
+  if build == "all":
+    generate_pc(fin, fout, fami)
+    generate_engine(fin, fout, fami)
+  elif build == "nes":
+    generate_engine(fin, fout, fami)
+  elif build == "pc":
+    generate_pc(fin, fout, fami)
+  else: # default
+    generate_pc(fin, fout, fami)
+    generate_engine(fin, fout, fami)
+
+  with open(fout.joinpath("inc").with_name("cnes_audio_gen.h"), 'w') as f:
     f.write('''
 /**
  * Generated include file by the CNES build process. Include these
@@ -322,4 +281,23 @@ def main():
 ''')
 
 if __name__ == '__main__':
-  main()
+  parser = argparse.ArgumentParser(description='Processes Famistudio audio and outputs to NES and SDL formats')
+  
+  parser.add_argument('-a', '--all', action="store_true")
+  parser.add_argument('-n', '--nes', action="store_true")
+  parser.add_argument('-p', '--pc', action="store_true")
+  parser.add_argument('-F', '--famistudio-path', type=str,
+                      help='Path to the famistudio executable''')
+  parser.add_argument('fin', metavar='in', type=str,
+                      help='Input Directory of fms files to build the song data from')
+  parser.add_argument('fout', metavar='out', type=str,
+                      help='Build Directory to write the output files to.')
+                      
+  args = parser.parse_args()
+  if args.nes:
+    build = "nes"
+  elif args.pc:
+    build = "pc"
+  else:
+    build = "all"
+  main(args.famistudio_path, args.fin, args.fout, build=build)

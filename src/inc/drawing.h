@@ -67,33 +67,29 @@ ZP(vblank_tasks);
 #define UPDATE_BACKGROUND (1 << 5)
 #define update_palette() do { vblank_tasks |= UPDATE_PALETTE; } while (0);
 
-void set_scroll_off();
-void set_scroll_horizontal();
-void set_scroll_vertical();
-void set_scroll_omni();
 
+/**
+ * @brief Configures the mirroring mode for the screens.
+ * 
+ */
+
+void set_horizontal_mirroring();
+void set_vertical_mirroring();
+
+/**
+ * @brief Disables rendering for the next frame. Allows you to access the PPU RAM without
+ * any rendering glitches, but the screen will be black during this time.
+ * 
+ */
 void disable_rendering();
 void enable_rendering();
-void clear_screen();
 
 /**
- * @brief 
+ * @brief Draws a single tile to the an entire nametable
  * 
+ * @param tile 
  */
-void __LIB_CALLSPEC draw_metasprite(u8 object_slot);
-
-/**
- * @brief 
- * 
- * @param metatile_id 
- */
-void __LIB_CALLSPEC load_metatile(u8 metatile_id);
-
-/**
- * @brief 
- * 
- */
-void __LIB_CALLSPEC place_metatile(u8 metatile_id, u8 x, u8 y);
+void clear_screen(u8 screen, u8 tile);
 
 
 #ifdef __cplusplus

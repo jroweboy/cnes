@@ -6,3 +6,5 @@ example/build/
 **/tiled/example
 **/cc65/samples
 **/cc65/html
+__pycache__
+
