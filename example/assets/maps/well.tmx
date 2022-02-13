@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.8" tiledversion="1.8.0" orientation="orthogonal" renderorder="right-down" width="2" height="2" tilewidth="8" tileheight="8" infinite="0" nextlayerid="4" nextobjectid="1">
+ <properties>
+  <property name="Palette 0:1" value="27"/>
+  <property name="Palette 0:2" value="16"/>
+  <property name="Palette 0:3" value="0f"/>
+  <property name="Palette 1:1" value="20"/>
+  <property name="Palette 1:2" value="28"/>
+  <property name="Palette 1:3" value="0f"/>
+  <property name="Palette 2:1" value="3a"/>
+  <property name="Palette 2:2" value="1b"/>
+  <property name="Palette 2:3" value="0f"/>
+  <property name="Palette 3:1" value="30"/>
+  <property name="Palette 3:2" value="11"/>
+  <property name="Palette 3:3" value="0f"/>
+  <property name="Palette BG" value="19"/>
+ </properties>
+ <tileset firstgid="1" name="AttributeTileset" tilewidth="8" tileheight="8" tilecount="4" columns="0">
+  <grid orientation="orthogonal" width="0" height="0"/>
+  <tile id="0">
+   <properties>
+    <property name="Palette" value="0"/>
+   </properties>
+   <image width="8" height="8" format="png">
+    <data encoding="base64">iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAJUlEQVQYlWNgGHjAiEtihpLCfwYGBgYmkk240gHRqVPxgIEoEwB26wXfz7HfXAAAAABJRU5ErkJggg==</data>
+   </image>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="Palette" value="1"/>
+   </properties>
+   <image width="8" height="8" format="png">
+    <data encoding="base64">iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAKklEQVQYlWNgGHjAiEtiwSqG/wwMDAxMJJvw5t2b/wwMDAwiQiIMRJkAAK/DBk9KadK7AAAAAElFTkSuQmCC</data>
+   </image>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="Palette" value="2"/>
+   </properties>
+   <image width="8" height="8" format="png">
+    <data encoding="base64">iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAKUlEQVQYlWNgGHjAiFOmTOM/AwMDAxPJJqx4NOE/AwMDQ4RcAQNRJgAAYmMFoxjfbd4AAAAASUVORK5CYII=</data>
+   </image>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="Palette" value="3"/>
+   </properties>
+   <image width="8" height="8" format="png">
+    <data encoding="base64">iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAKklEQVQYlWNgGHjAiEuCw+fIfwYGBgYmkk148+7NfwYGBgYRIREGokwAAJmzBh00/HRQAAAAAElFTkSuQmCC</data>
+   </image>
+  </tile>
+ </tileset>
+ <tileset firstgid="5" name="AttributeTileset" tilewidth="8" tileheight="8" tilecount="4" columns="0">
+  <grid orientation="orthogonal" width="0" height="0"/>
+  <tile id="0">
+   <properties>
+    <property name="Palette" value="0"/>
+   </properties>
+   <image width="8" height="8" format="png">
+    <data encoding="base64">iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAJUlEQVQYlWNgGHjAiEtihpLCfwYGBgYmkk240gHRqVPxgIEoEwB26wXfz7HfXAAAAABJRU5ErkJggg==</data>
+   </image>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="Palette" value="1"/>
+   </properties>
+   <image width="8" height="8" format="png">
+    <data encoding="base64">iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAKklEQVQYlWNgGHjAiEtiwSqG/wwMDAxMJJvw5t2b/wwMDAwiQiIMRJkAAK/DBk9KadK7AAAAAElFTkSuQmCC</data>
+   </image>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="Palette" value="2"/>
+   </properties>
+   <image width="8" height="8" format="png">
+    <data encoding="base64">iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAKUlEQVQYlWNgGHjAiFOmTOM/AwMDAxPJJqx4NOE/AwMDQ4RcAQNRJgAAYmMFoxjfbd4AAAAASUVORK5CYII=</data>
+   </image>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="Palette" value="3"/>
+   </properties>
+   <image width="8" height="8" format="png">
+    <data encoding="base64">iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAKklEQVQYlWNgGHjAiEuCw+fIfwYGBgYmkk148+7NfwYGBgYRIREGokwAAJmzBh00/HRQAAAAAElFTkSuQmCC</data>
+   </image>
+  </tile>
+ </tileset>
+ <tileset firstgid="9" source="scratch/crystalis_town_tileset.tsx"/>
+ <layer id="2" name="Tile" width="2" height="2">
+  <data encoding="csv">
+239,240,
+207,208
+</data>
+ </layer>
+ <layer id="3" name="Attribute" width="2" height="2" visible="0" locked="1">
+  <properties>
+   <property name="AttributeHeight" type="int" value="16"/>
+   <property name="AttributeOffsetX" type="int" value="0"/>
+   <property name="AttributeOffsetY" type="int" value="0"/>
+   <property name="AttributeWidth" type="int" value="16"/>
+  </properties>
+  <data encoding="csv">
+1,1,
+1,1
+</data>
+ </layer>
+</map>

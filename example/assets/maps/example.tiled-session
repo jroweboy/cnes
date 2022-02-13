@@ -3,15 +3,28 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "maps/title_screen.tmx",
+    "activeFile": "title_screen.tmx",
+    "automapping.whileDrawing": false,
+    "console.history": [
+        "Image.FORMAT_RGB16",
+        "log(Image.FORMAT_RGB16)",
+        "tiled.log(Image.FORMAT_RGB16)",
+        "tiled.log(\"\" + Image.FORMAT_RGB16)",
+        "tiled.log(\"testy \" + Image.FORMAT_RGB16)",
+        "tiled.log(\"testy \" + Image.Format_RGB16)",
+        "tiled.log(\"testy \" + Image.Format_RGBA8888)",
+        "tiled.log(\"testy \" + Image.Format_Indexed8)"
+    ],
     "expandedProjectPaths": [
+        "scratch",
+        ".",
         "maps"
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "": {
-            "scaleInDock": 1,
-            "scaleInEditor": 1
+            "scaleInDock": 5.5,
+            "scaleInEditor": 8
         },
         "maps/nametable.tmx": {
             "scale": 3.5902083333333334,
@@ -60,28 +73,101 @@
         },
         "maps/title_screen.tmx#title_screen-Tileset": {
             "scaleInDock": 2
+        },
+        "scratch/crystalis.pal": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 11
+        },
+        "scratch/crystalis_town.chr": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 2
+        },
+        "scratch/crystalis_town.chr.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 4
+        },
+        "scratch/crystalis_town_tileset.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 2,
+            "scaleInEditor": 3
+        },
+        "scratch/two.pal": {
+            "scaleInDock": 5.5,
+            "scaleInEditor": 8
+        },
+        "scratch/well.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 8,
+            "scaleInEditor": 11
+        },
+        "scratch/whatever.pal": {
+            "dynamicWrapping": true,
+            "scaleInDock": 4,
+            "scaleInEditor": 11
+        },
+        "title_screen.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 252.33333333333334,
+                "y": 229.66666666666663
+            }
+        },
+        "title_screen.tmx#AttributeTileset": {
+            "dynamicWrapping": true,
+            "scaleInDock": 5.5,
+            "scaleInEditor": 8
+        },
+        "title_screen.tmx#C:/dev/cnes/example/assets/maps/scratch/title_screen_tileset": {
+            "scaleInDock": 1
+        },
+        "well.tmx": {
+            "scale": 8,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 18.4375,
+                "y": -5.3125
+            }
+        },
+        "well.tmx#AttributeTileset": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
         }
     },
-    "last.imagePath": "C:/dev/cnes/example/assets/maps",
-    "map.height": 30,
+    "last.imagePath": "C:/dev/cnes/example/assets/maps/scratch",
+    "map.height": 2,
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 8,
     "map.tileWidth": 8,
-    "map.width": 32,
+    "map.width": 2,
     "openFiles": [
-        "maps/test.tmx",
-        "maps/title_screen.tmx"
+        "title_screen.tmx"
     ],
     "project": "example.tiled-project",
+    "property.type": "color",
     "recentFiles": [
+        "scratch/whatever.pal",
+        "scratch/crystalis.pal",
+        "scratch/crystalis_town.chr",
+        "title_screen.tmx",
+        "scratch/crystalis_town.chr.tsx",
+        "scratch/crystalis_town_tileset.tsx",
+        "scratch/two.pal",
+        "well.tmx",
+        "scratch/well.tsx",
         "maps/title_screen.tmx",
         "maps/test.tmx",
         "maps/nametable.tmx"
     ],
-    "tileset.embedInMap": true,
+    "tileset.embedInMap": false,
+    "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
         "height": 8,
         "width": 8
     },
-    "tileset.transparentColor": "#000000"
+    "tileset.transparentColor": "#000000",
+    "tileset.useTransparentColor": false
 }
