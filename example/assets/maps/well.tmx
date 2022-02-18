@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.0" orientation="orthogonal" renderorder="right-down" width="2" height="2" tilewidth="8" tileheight="8" infinite="0" nextlayerid="4" nextobjectid="1">
+<map version="1.8" tiledversion="1.8.1" orientation="orthogonal" renderorder="right-down" width="2" height="2" tilewidth="8" tileheight="8" infinite="0" nextlayerid="4" nextobjectid="1">
  <properties>
   <property name="Palette 0:1" value="27"/>
   <property name="Palette 0:2" value="16"/>
@@ -16,7 +16,6 @@
   <property name="Palette BG" value="19"/>
  </properties>
  <tileset firstgid="1" name="AttributeTileset" tilewidth="8" tileheight="8" tilecount="4" columns="0">
-  <grid orientation="orthogonal" width="0" height="0"/>
   <tile id="0">
    <properties>
     <property name="Palette" value="0"/>
@@ -51,7 +50,6 @@
   </tile>
  </tileset>
  <tileset firstgid="5" name="AttributeTileset" tilewidth="8" tileheight="8" tilecount="4" columns="0">
-  <grid orientation="orthogonal" width="0" height="0"/>
   <tile id="0">
    <properties>
     <property name="Palette" value="0"/>
@@ -85,11 +83,11 @@
    </image>
   </tile>
  </tileset>
- <tileset firstgid="9" source="scratch/crystalis_town_tileset.tsx"/>
+ <tileset firstgid="9" source="scratch/crystalis_town.chr"/>
  <layer id="2" name="Tile" width="2" height="2">
   <data encoding="csv">
-239,240,
-207,208
+116,117,
+118,119
 </data>
  </layer>
  <layer id="3" name="Attribute" width="2" height="2" visible="0" locked="1">
